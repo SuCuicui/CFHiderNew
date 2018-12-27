@@ -1,0 +1,27 @@
+enclave {
+	//include "../Enclave/vfslib/types.h"
+	untrusted {
+        ssize_t ocall_read(int file, [out, size=count] void *buf, size_t count);
+        ssize_t ocall_write(int file, [in, size=count] const void *buf, size_t count);
+        int ocall_close(int fd);
+
+        int ocall_fchown(int fd, uid_t owner, gid_t group);
+        char *ocall_getcwd([in,out, count = size]char *buf, size_t size);
+        int ocall_truncate([in, string]const char *path, off_t length);
+        int ocall_ftruncate(int fd, off_t length);
+        ssize_t ocall_pread(int fd, [out,size=count]void *buf, size_t count, off_t offset);
+        ssize_t ocall_pwrite(int fd, [in, size=count]const void *buf, size_t count, off_t offset);
+        int ocall_access([in,string]const char* pathname, int mode);
+        int ocall_unlink([in, string]const char *pathname);
+        int ocall_rmdir([in, string]const char *pathname);
+        uid_t ocall_geteuid(void);
+        //uid_t ocall_getuid(void);
+        off_t ocall_lseek(int fd, off_t offset, int whence);
+        int ocall_fsync(int fd);
+        pid_t ocall_getpid(void);
+        unsigned int ocall_sleep(unsigned int seconds);
+
+
+
+    };
+};

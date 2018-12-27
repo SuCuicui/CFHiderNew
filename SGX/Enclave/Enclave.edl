@@ -1,0 +1,66 @@
+/* Enclave.edl - Top EDL file. */
+
+enclave {
+	
+	include "user_types.h" /* buffer_t */
+
+	from "../App/function/print.edl" import *;
+	from "io/stdio.edl" import *;
+	from "io/fcntl.edl" import *;
+	from "io/stdlib.edl" import *;
+	from "io/stat.edl" import *;
+	from "io/time.edl" import *;
+	from "io/unistd.edl" import *;
+	trusted{
+		public int encall_switch_type_i(long Line, [user_check]int* int_array, int lenint,
+					[user_check]double* double_array, int lendouble,
+					[user_check]float* float_array, int lenfloat,
+					[user_check]char* char_array, int lenchar,
+					[user_check]long* long_array, int lenlong,
+					[user_check]char* byte_array, int lenbyte);
+		public double encall_switch_type_d(long Line, [user_check]int* int_array, int lenint,
+					[user_check]double* double_array, int lendouble,
+					[user_check]float* float_array, int lenfloat,
+					[user_check]char* char_array, int lenchar,
+					[user_check]long* long_array, int lenlong,
+					[user_check]char* byte_array, int lenbyte);
+		public float encall_switch_type_f(long Line, [user_check]int* int_array, int lenint,
+					[user_check]double* double_array, int lendouble,
+					[user_check]float* float_array, int lenfloat,
+					[user_check]char* char_array, int lenchar,
+					[user_check]long* long_array, int lenlong,
+					[user_check]char* byte_array, int lenbyte);
+		public char encall_switch_type_c(long Line, [user_check]int* int_array, int lenint,
+					[user_check]double* double_array, int lendouble,
+					[user_check]float* float_array, int lenfloat,
+					[user_check]char* char_array, int lenchar,
+					[user_check]long* long_array, int lenlong,
+					[user_check]char* byte_array, int lenbyte);
+		public long encall_switch_type_l(long Line, [user_check]int* int_array, int lenint,
+					[user_check]double* double_array, int lendouble,
+					[user_check]float* float_array, int lenfloat,
+					[user_check]char* char_array, int lenchar,
+					[user_check]long* long_array, int lenlong,
+					[user_check]char* byte_array, int lenbyte);
+		public char encall_switch_type_b(long Line, [user_check]int* int_array, int lenint,
+					[user_check]double* double_array, int lendouble,
+					[user_check]float* float_array, int lenfloat,
+					[user_check]char* char_array, int lenchar,
+					[user_check]long* long_array, int lenlong,
+					[user_check]char* byte_array, int lenbyte);
+
+		public int print_int(long line,[user_check]int* int_array);
+		public double print_double(long line,[user_check]double* double_array);
+		public float print_float(long line,[user_check]float* float_array);
+		public char print_char(long line,[user_check]char* char_array);
+		public long print_long(long line,[user_check]long* long_array);
+		public char print_byte(long line,[user_check]char* byte_array);
+
+		public int encall_table_load(void);
+		public int encall_hash_readin([in,size=400]char* buf,long line);
+		public int encall_read_line([in,size=50]char* in_buf,int buf_len,long line);
+		
+		public void encall_varible([user_check]int* v_array,int size);
+	};
+
+};

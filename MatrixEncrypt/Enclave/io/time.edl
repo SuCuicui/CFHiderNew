@@ -1,0 +1,9 @@
+enclave {
+
+	//include "../Enclave/vfslib/types.h"
+	untrusted {
+        time_t ocall_time([in]time_t *t);
+		int ocall_utimes([in, string]const char *filename, [in, count=2]const struct timeval *times);
+		int ocall_gettimeofday([out]struct timeval *tv);
+    };
+};

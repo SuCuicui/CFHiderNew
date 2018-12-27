@@ -1,0 +1,9 @@
+enclave {
+
+	untrusted {
+        //ocall functions for stdio.cpp
+        char *ocall_getenv([in, string]const char *name);
+
+    };
+
+};

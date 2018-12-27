@@ -1,0 +1,11 @@
+enclave {
+	//include"../Enclave/vfslib/types.h"
+	untrusted {
+        int ocall_open([in, string] const char* filename, int flags, mode_t mode);
+        int ocall_fallocate(int fd, int mode, off_t offset, off_t len);
+    	int ocall_fcntl_flock(int fd, int cmd, [in]struct flock *p);
+        int ocall_fcntl_int(int fd, int cmd,int  pa);
+        int ocall_fcntl_void(int fd, int cmd);
+    };
+
+};

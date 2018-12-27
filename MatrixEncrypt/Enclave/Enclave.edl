@@ -1,0 +1,26 @@
+/* Enclave.edl - Top EDL file. */
+
+enclave {
+	
+	include "user_types.h" /* buffer_t */
+	from "io/stdio.edl" import *;
+	from "io/fcntl.edl" import *;
+	from "io/stdlib.edl" import *;
+	from "io/stat.edl" import *;
+	from "io/time.edl" import *;
+	from "io/unistd.edl" import *;
+	trusted {
+		public int encall_test([in,string]char* a);
+		public int ecall_ctr_encrypt([in,string]const char *sql,[in,string]const char *sgx_ctr_key,[in,out,size=64] uint8_t *p_dst);
+		public int ecall_ctr_decrypt([in,size=64]uint8_t *sql, [in,string]const char *sgx_ctr_key, [in,out,size=64]uint8_t *p_dst,int len);
+	};
+	/* 
+	 * ocall_print_string - invokes OCALL to display string buffer inside the enclave.
+	 *  [in]: copy the string buffer to App outside.
+	 *  [string]: specifies 'str' is a NULL terminated buffer.
+	 */
+	untrusted {
+		void ocall_print_string([in, string] const char *str);
+	};
+
+};	
