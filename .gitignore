@@ -1,0 +1,7 @@
+*.class
+*.jimple
+*.zip
+*.tar
+*.tar.gz
+*.o
+*.log

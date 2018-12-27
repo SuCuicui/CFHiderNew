@@ -1,0 +1,1419 @@
+public class invoker.sgx_invoker extends java.lang.Object
+{
+    public static final int N;
+    static final int cacheSize;
+    static java.util.HashMap CFCache;
+    static java.util.HashMap cacheClock;
+    static java.util.HashMap cacheClockHour;
+    static long clock;
+    static long clockHour;
+    static final long expire;
+    java.lang.Object[] objArray;
+    int objTail;
+    int[] intArray;
+    int intTail;
+    double[] doubleArray;
+    int doubleTail;
+    float[] floatArray;
+    int floatTail;
+    long[] longArray;
+    int longTail;
+    char[] charArray;
+    int charTail;
+    byte[] byteArray;
+    int byteTail;
+    long counter;
+    static long request;
+    static long hitNum;
+
+    static void <clinit>()
+    {
+        int temp$0, temp$9;
+        java.io.PrintStream temp$1, temp$5;
+        java.lang.StringBuffer temp$2, temp$6;
+        java.lang.String temp$3, temp$4, temp$7, temp$8;
+        java.lang.Exception e;
+        java.util.HashMap temp$10, temp$11, temp$12;
+        long temp$13, temp$14, temp$15, temp$16, temp$17;
+
+        temp$0 = 20;
+        <invoker.sgx_invoker: int N> = temp$0;
+
+     label0:
+        nop;
+        temp$1 = <java.lang.System: java.io.PrintStream out>;
+        temp$2 = new java.lang.StringBuffer;
+        specialinvoke temp$2.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$2.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>("invoker");
+        temp$3 = staticinvoke <java.lang.System: java.lang.String getProperty(java.lang.String)>("java.library.path");
+        virtualinvoke temp$2.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>(temp$3);
+        temp$4 = virtualinvoke temp$2.<java.lang.StringBuffer: java.lang.String toString()>();
+        virtualinvoke temp$1.<java.io.PrintStream: void println(java.lang.String)>(temp$4);
+        staticinvoke <java.lang.System: void loadLibrary(java.lang.String)>("SGX");
+        goto label2;
+
+     label1:
+        nop;
+        e := @caughtexception;
+        temp$5 = <java.lang.System: java.io.PrintStream out>;
+        temp$6 = new java.lang.StringBuffer;
+        specialinvoke temp$6.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$6.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>("invoker");
+        temp$7 = staticinvoke <java.lang.System: java.lang.String getProperty(java.lang.String)>("java.library.path");
+        virtualinvoke temp$6.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>(temp$7);
+        temp$8 = virtualinvoke temp$6.<java.lang.StringBuffer: java.lang.String toString()>();
+        virtualinvoke temp$5.<java.io.PrintStream: void println(java.lang.String)>(temp$8);
+        virtualinvoke e.<java.lang.Exception: void printStackTrace()>();
+        nop;
+        goto label2;
+
+     label2:
+        nop;
+        temp$9 = 100;
+        <invoker.sgx_invoker: int cacheSize> = temp$9;
+        temp$10 = new java.util.HashMap;
+        specialinvoke temp$10.<java.util.HashMap: void <init>()>();
+        <invoker.sgx_invoker: java.util.HashMap CFCache> = temp$10;
+        temp$11 = new java.util.HashMap;
+        specialinvoke temp$11.<java.util.HashMap: void <init>()>();
+        <invoker.sgx_invoker: java.util.HashMap cacheClock> = temp$11;
+        temp$12 = new java.util.HashMap;
+        specialinvoke temp$12.<java.util.HashMap: void <init>()>();
+        <invoker.sgx_invoker: java.util.HashMap cacheClockHour> = temp$12;
+        temp$13 = 0L;
+        <invoker.sgx_invoker: long clock> = temp$13;
+        temp$14 = 0L;
+        <invoker.sgx_invoker: long clockHour> = temp$14;
+        temp$15 = 1000L;
+        <invoker.sgx_invoker: long expire> = temp$15;
+        temp$16 = 1L;
+        <invoker.sgx_invoker: long request> = temp$16;
+        temp$17 = 0L;
+        <invoker.sgx_invoker: long hitNum> = temp$17;
+        return;
+
+        catch java.lang.Exception from label0 to label1 with label1;
+    }
+
+    public static native int print_ms();
+
+    public static native int init();
+
+    public static native int destroy();
+
+    public static native int commitInt(long, int[], int, double[], int, float[], int, long[], int, char[], int, byte[], int);
+
+    public static native float commitFloat(long, int[], int, double[], int, float[], int, long[], int, char[], int, byte[], int);
+
+    public static native double commitDouble(long, int[], int, double[], int, float[], int, long[], int, char[], int, byte[], int);
+
+    public static native char commitChar(long, int[], int, double[], int, float[], int, long[], int, char[], int, byte[], int);
+
+    public static native byte commitByte(long, int[], int, double[], int, float[], int, long[], int, char[], int, byte[], int);
+
+    public static native int commitBranch(long, int[], int, double[], int, float[], int, long[], int, char[], int, byte[], int);
+
+    public static native int commitUpdate(long, int[], int, double[], int, float[], int, long[], int, char[], int, byte[], int);
+
+    public static native int initValue(int[], int);
+
+    public void sgx_invoker()
+    {
+        invoker.sgx_invoker this;
+
+        this := @this: invoker.sgx_invoker;
+        return;
+    }
+
+    private final java.lang.String check_cache(int)
+    {
+        invoker.sgx_invoker this;
+        int c_hash, temp$2, temp$10;
+        long temp$0, temp$1, temp$6, temp$7, temp$8, temp$9, temp$11, temp$12, temp$13, temp$14, temp$15, temp$16, temp$17, temp$18, temp$19, temp$23, temp$24, temp$25, temp$28;
+        java.io.PrintStream temp$3, temp$4;
+        java.lang.String temp$5, temp$33, temp$34;
+        java.lang.Integer hash, temp$20;
+        java.util.HashMap temp$21, temp$26, temp$31;
+        boolean temp$22;
+        java.lang.Long temp$27, temp$30;
+        java.lang.Object temp$29, temp$32;
+
+        this := @this: invoker.sgx_invoker;
+        c_hash := @parameter0: int;
+        temp$0 = <invoker.sgx_invoker: long clock>;
+        temp$1 = temp$0 % 10000000L;
+        temp$2 = temp$1 cmp 0L;
+        if temp$2 != 0 goto label1;
+
+        goto label0;
+
+     label0:
+        nop;
+        temp$3 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$3.<java.io.PrintStream: void println(java.lang.String)>("############################ Cache Hit ##########################\n");
+        temp$4 = <java.lang.System: java.io.PrintStream out>;
+        temp$5 = staticinvoke <invoker.sgx_invoker: java.lang.String getHitRatio()>();
+        virtualinvoke temp$4.<java.io.PrintStream: void println(java.lang.String)>(temp$5);
+
+     label1:
+        nop;
+        temp$6 = <invoker.sgx_invoker: long request>;
+        temp$7 = (long) 1;
+        temp$8 = temp$6 + temp$7;
+        <invoker.sgx_invoker: long request> = temp$8;
+        temp$9 = <invoker.sgx_invoker: long clock>;
+        temp$10 = temp$9 cmp 9223372036854775807L;
+        if temp$10 != 0 goto label3;
+
+        goto label2;
+
+     label2:
+        nop;
+        temp$11 = 0L;
+        <invoker.sgx_invoker: long clock> = temp$11;
+        temp$12 = <invoker.sgx_invoker: long clockHour>;
+        temp$13 = (long) 1;
+        temp$14 = temp$12 + temp$13;
+        <invoker.sgx_invoker: long clockHour> = temp$14;
+        temp$15 = 1L;
+        <invoker.sgx_invoker: long request> = temp$15;
+        temp$16 = 0L;
+        <invoker.sgx_invoker: long hitNum> = temp$16;
+        goto label4;
+
+     label3:
+        nop;
+        temp$17 = <invoker.sgx_invoker: long clock>;
+        temp$18 = (long) 1;
+        temp$19 = temp$17 + temp$18;
+        <invoker.sgx_invoker: long clock> = temp$19;
+
+     label4:
+        nop;
+        temp$20 = new java.lang.Integer;
+        specialinvoke temp$20.<java.lang.Integer: void <init>(int)>(c_hash);
+        hash = temp$20;
+        temp$21 = <invoker.sgx_invoker: java.util.HashMap CFCache>;
+        temp$22 = virtualinvoke temp$21.<java.util.HashMap: boolean containsKey(java.lang.Object)>(hash);
+        if temp$22 == 0 goto label6;
+
+        goto label5;
+
+     label5:
+        nop;
+        temp$23 = <invoker.sgx_invoker: long hitNum>;
+        temp$24 = (long) 1;
+        temp$25 = temp$23 + temp$24;
+        <invoker.sgx_invoker: long hitNum> = temp$25;
+        temp$26 = <invoker.sgx_invoker: java.util.HashMap cacheClock>;
+        temp$27 = new java.lang.Long;
+        temp$28 = <invoker.sgx_invoker: long clock>;
+        specialinvoke temp$27.<java.lang.Long: void <init>(long)>(temp$28);
+        temp$29 = virtualinvoke temp$26.<java.util.HashMap: java.lang.Object put(java.lang.Object,java.lang.Object)>(hash, temp$27);
+        temp$30 = (java.lang.Long) temp$29;
+        temp$31 = <invoker.sgx_invoker: java.util.HashMap CFCache>;
+        temp$32 = virtualinvoke temp$31.<java.util.HashMap: java.lang.Object get(java.lang.Object)>(hash);
+        temp$33 = (java.lang.String) temp$32;
+        return temp$33;
+
+     label6:
+        nop;
+        temp$34 = null;
+        return temp$34;
+    }
+
+    public static java.lang.String getHitRatio()
+    {
+        java.lang.StringBuffer temp$0;
+        long temp$1, temp$2;
+        java.lang.String temp$3;
+
+        temp$0 = new java.lang.StringBuffer;
+        specialinvoke temp$0.<java.lang.StringBuffer: void <init>()>();
+        temp$1 = <invoker.sgx_invoker: long hitNum>;
+        virtualinvoke temp$0.<java.lang.StringBuffer: java.lang.StringBuffer append(long)>(temp$1);
+        virtualinvoke temp$0.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>("||");
+        temp$2 = <invoker.sgx_invoker: long request>;
+        virtualinvoke temp$0.<java.lang.StringBuffer: java.lang.StringBuffer append(long)>(temp$2);
+        temp$3 = virtualinvoke temp$0.<java.lang.StringBuffer: java.lang.String toString()>();
+        return temp$3;
+    }
+
+    private final void updateCache(int, java.lang.String)
+    {
+        invoker.sgx_invoker this;
+        int c_hash, temp$2;
+        java.lang.String 'ret', temp$5, temp$18;
+        java.lang.Integer hash, temp$0;
+        java.util.HashMap temp$1, temp$3, temp$6, temp$11, temp$16, temp$19, temp$24;
+        java.lang.Object temp$4, temp$9, temp$14, temp$17, temp$22, temp$27;
+        java.lang.Long temp$7, temp$10, temp$12, temp$15, temp$20, temp$23, temp$25, temp$28;
+        long temp$8, temp$13, temp$21, temp$26;
+
+        this := @this: invoker.sgx_invoker;
+        c_hash := @parameter0: int;
+        'ret' := @parameter1: java.lang.String;
+        temp$0 = new java.lang.Integer;
+        specialinvoke temp$0.<java.lang.Integer: void <init>(int)>(c_hash);
+        hash = temp$0;
+        temp$1 = <invoker.sgx_invoker: java.util.HashMap CFCache>;
+        temp$2 = virtualinvoke temp$1.<java.util.HashMap: int size()>();
+        if temp$2 < 100 goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$3 = <invoker.sgx_invoker: java.util.HashMap CFCache>;
+        temp$4 = virtualinvoke temp$3.<java.util.HashMap: java.lang.Object put(java.lang.Object,java.lang.Object)>(hash, 'ret');
+        temp$5 = (java.lang.String) temp$4;
+        temp$6 = <invoker.sgx_invoker: java.util.HashMap cacheClock>;
+        temp$7 = new java.lang.Long;
+        temp$8 = <invoker.sgx_invoker: long clock>;
+        specialinvoke temp$7.<java.lang.Long: void <init>(long)>(temp$8);
+        temp$9 = virtualinvoke temp$6.<java.util.HashMap: java.lang.Object put(java.lang.Object,java.lang.Object)>(hash, temp$7);
+        temp$10 = (java.lang.Long) temp$9;
+        temp$11 = <invoker.sgx_invoker: java.util.HashMap cacheClockHour>;
+        temp$12 = new java.lang.Long;
+        temp$13 = <invoker.sgx_invoker: long clockHour>;
+        specialinvoke temp$12.<java.lang.Long: void <init>(long)>(temp$13);
+        temp$14 = virtualinvoke temp$11.<java.util.HashMap: java.lang.Object put(java.lang.Object,java.lang.Object)>(hash, temp$12);
+        temp$15 = (java.lang.Long) temp$14;
+        goto label2;
+
+     label1:
+        nop;
+        temp$16 = <invoker.sgx_invoker: java.util.HashMap CFCache>;
+        temp$17 = virtualinvoke temp$16.<java.util.HashMap: java.lang.Object put(java.lang.Object,java.lang.Object)>(hash, 'ret');
+        temp$18 = (java.lang.String) temp$17;
+        temp$19 = <invoker.sgx_invoker: java.util.HashMap cacheClock>;
+        temp$20 = new java.lang.Long;
+        temp$21 = <invoker.sgx_invoker: long clock>;
+        specialinvoke temp$20.<java.lang.Long: void <init>(long)>(temp$21);
+        temp$22 = virtualinvoke temp$19.<java.util.HashMap: java.lang.Object put(java.lang.Object,java.lang.Object)>(hash, temp$20);
+        temp$23 = (java.lang.Long) temp$22;
+        temp$24 = <invoker.sgx_invoker: java.util.HashMap cacheClockHour>;
+        temp$25 = new java.lang.Long;
+        temp$26 = <invoker.sgx_invoker: long clockHour>;
+        specialinvoke temp$25.<java.lang.Long: void <init>(long)>(temp$26);
+        temp$27 = virtualinvoke temp$24.<java.util.HashMap: java.lang.Object put(java.lang.Object,java.lang.Object)>(hash, temp$25);
+        temp$28 = (java.lang.Long) temp$27;
+
+     label2:
+        nop;
+        return;
+    }
+
+    private final java.lang.Integer getExpireCache()
+    {
+        invoker.sgx_invoker this;
+        java.util.HashMap temp$0, temp$6, temp$9;
+        java.util.Set temp$1, temp$2;
+        java.util.Iterator temp$3;
+        java.lang.Integer i, temp$13;
+        boolean temp$4, temp$12;
+        java.lang.Object temp$5, temp$7, temp$10;
+        java.lang.Long temp$8, temp$11;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = <invoker.sgx_invoker: java.util.HashMap CFCache>;
+        temp$1 = virtualinvoke temp$0.<java.util.HashMap: java.util.Set keySet()>();
+        temp$2 = (java.util.Set) temp$1;
+        temp$3 = interfaceinvoke temp$2.<java.lang.Iterable: java.util.Iterator iterator()>();
+
+     label0:
+        nop;
+        temp$4 = interfaceinvoke temp$3.<java.util.Iterator: boolean hasNext()>();
+        if temp$4 == 0 goto label3;
+
+        temp$5 = interfaceinvoke temp$3.<java.util.Iterator: java.lang.Object next()>();
+        i = (java.lang.Integer) temp$5;
+        temp$6 = <invoker.sgx_invoker: java.util.HashMap cacheClock>;
+        temp$7 = virtualinvoke temp$6.<java.util.HashMap: java.lang.Object get(java.lang.Object)>(i);
+        temp$8 = (java.lang.Long) temp$7;
+        temp$9 = <invoker.sgx_invoker: java.util.HashMap cacheClockHour>;
+        temp$10 = virtualinvoke temp$9.<java.util.HashMap: java.lang.Object get(java.lang.Object)>(i);
+        temp$11 = (java.lang.Long) temp$10;
+        temp$12 = virtualinvoke this.<invoker.sgx_invoker: boolean computeExpire(java.lang.Long,java.lang.Long,long)>(temp$8, temp$11, 1000L);
+        if temp$12 == 0 goto label2;
+
+        goto label1;
+
+     label1:
+        nop;
+        return i;
+
+     label2:
+        nop;
+        nop;
+        goto label0;
+
+     label3:
+        nop;
+        temp$13 = null;
+        return temp$13;
+    }
+
+    private final boolean computeExpire(java.lang.Long, java.lang.Long, long)
+    {
+        invoker.sgx_invoker this;
+        java.lang.Long hashClock, hashHour;
+        long expire, temp$0, temp$1, temp$3, temp$4, temp$5, temp$8, temp$9, temp$10, temp$12, temp$13, temp$14, temp$15;
+        int temp$2, temp$6, temp$11, temp$16;
+        boolean temp$7, temp$17, temp$18;
+
+        this := @this: invoker.sgx_invoker;
+        hashClock := @parameter0: java.lang.Long;
+        hashHour := @parameter1: java.lang.Long;
+        expire := @parameter2: long;
+        temp$0 = <invoker.sgx_invoker: long clockHour>;
+        temp$1 = virtualinvoke hashHour.<java.lang.Long: long longValue()>();
+        temp$2 = temp$0 cmp temp$1;
+        if temp$2 != 0 goto label2;
+
+        goto label0;
+
+     label0:
+        nop;
+        temp$3 = virtualinvoke hashClock.<java.lang.Long: long longValue()>();
+        temp$4 = <invoker.sgx_invoker: long clock>;
+        temp$5 = temp$4 - temp$3;
+        temp$6 = temp$5 cmp expire;
+        if temp$6 >= 0 goto label2;
+
+        goto label1;
+
+        goto label1;
+
+     label1:
+        nop;
+        temp$7 = 0;
+        return temp$7;
+
+     label2:
+        nop;
+        temp$8 = <invoker.sgx_invoker: long clockHour>;
+        temp$9 = virtualinvoke hashHour.<java.lang.Long: long longValue()>();
+        temp$10 = temp$8 - temp$9;
+        temp$11 = temp$10 cmp 1L;
+        if temp$11 != 0 goto label5;
+
+        goto label3;
+
+     label3:
+        nop;
+        temp$12 = virtualinvoke hashClock.<java.lang.Long: long longValue()>();
+        temp$13 = <invoker.sgx_invoker: long clock>;
+        temp$14 = temp$12 - temp$13;
+        temp$15 = 9223372036854775807L - temp$14;
+        temp$16 = temp$15 cmp expire;
+        if temp$16 >= 0 goto label5;
+
+        goto label4;
+
+        goto label4;
+
+     label4:
+        nop;
+        temp$17 = 0;
+        return temp$17;
+
+     label5:
+        nop;
+        temp$18 = 1;
+        return temp$18;
+    }
+
+    public void clear()
+    {
+        invoker.sgx_invoker this;
+        int temp$0, temp$1, temp$2, temp$3, temp$4, temp$5;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = 0;
+        this.<invoker.sgx_invoker: int intTail> = temp$0;
+        temp$1 = 0;
+        this.<invoker.sgx_invoker: int doubleTail> = temp$1;
+        temp$2 = 0;
+        this.<invoker.sgx_invoker: int floatTail> = temp$2;
+        temp$3 = 0;
+        this.<invoker.sgx_invoker: int longTail> = temp$3;
+        temp$4 = 0;
+        this.<invoker.sgx_invoker: int charTail> = temp$4;
+        temp$5 = 0;
+        this.<invoker.sgx_invoker: int byteTail> = temp$5;
+        return;
+    }
+
+    public void add(java.lang.Object)
+    {
+        invoker.sgx_invoker this;
+        java.lang.Object o;
+        int[] temp$0, temp$5;
+        int temp$1, temp$2, temp$3, temp$4, temp$6, temp$7, temp$8, temp$9;
+
+        this := @this: invoker.sgx_invoker;
+        o := @parameter0: java.lang.Object;
+        if o == null goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$0 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$1 = this.<invoker.sgx_invoker: int intTail>;
+        temp$2 = temp$1 + 1;
+        this.<invoker.sgx_invoker: int intTail> = temp$2;
+        temp$3 = temp$1;
+        temp$4 = 0;
+        temp$0[temp$3] = temp$4;
+        goto label2;
+
+     label1:
+        nop;
+        temp$5 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$6 = this.<invoker.sgx_invoker: int intTail>;
+        temp$7 = temp$6 + 1;
+        this.<invoker.sgx_invoker: int intTail> = temp$7;
+        temp$8 = temp$6;
+        temp$9 = virtualinvoke o.<java.lang.Object: int hashCode()>();
+        temp$5[temp$8] = temp$9;
+
+     label2:
+        nop;
+        return;
+    }
+
+    public void add(int)
+    {
+        invoker.sgx_invoker this;
+        int o, temp$1, temp$2, temp$3;
+        int[] temp$0;
+
+        this := @this: invoker.sgx_invoker;
+        o := @parameter0: int;
+        temp$0 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$1 = this.<invoker.sgx_invoker: int intTail>;
+        temp$2 = temp$1 + 1;
+        this.<invoker.sgx_invoker: int intTail> = temp$2;
+        temp$3 = temp$1;
+        temp$0[temp$3] = o;
+        return;
+    }
+
+    public void add(double)
+    {
+        invoker.sgx_invoker this;
+        double o;
+        double[] temp$0;
+        int temp$1, temp$2, temp$3;
+
+        this := @this: invoker.sgx_invoker;
+        o := @parameter0: double;
+        temp$0 = this.<invoker.sgx_invoker: double[] doubleArray>;
+        temp$1 = this.<invoker.sgx_invoker: int doubleTail>;
+        temp$2 = temp$1 + 1;
+        this.<invoker.sgx_invoker: int doubleTail> = temp$2;
+        temp$3 = temp$1;
+        temp$0[temp$3] = o;
+        return;
+    }
+
+    public void add(float)
+    {
+        invoker.sgx_invoker this;
+        float o;
+        float[] temp$0;
+        int temp$1, temp$2, temp$3;
+
+        this := @this: invoker.sgx_invoker;
+        o := @parameter0: float;
+        temp$0 = this.<invoker.sgx_invoker: float[] floatArray>;
+        temp$1 = this.<invoker.sgx_invoker: int floatTail>;
+        temp$2 = temp$1 + 1;
+        this.<invoker.sgx_invoker: int floatTail> = temp$2;
+        temp$3 = temp$1;
+        temp$0[temp$3] = o;
+        return;
+    }
+
+    public void add(long)
+    {
+        invoker.sgx_invoker this;
+        long o;
+        long[] temp$0;
+        int temp$1, temp$2, temp$3;
+
+        this := @this: invoker.sgx_invoker;
+        o := @parameter0: long;
+        temp$0 = this.<invoker.sgx_invoker: long[] longArray>;
+        temp$1 = this.<invoker.sgx_invoker: int longTail>;
+        temp$2 = temp$1 + 1;
+        this.<invoker.sgx_invoker: int longTail> = temp$2;
+        temp$3 = temp$1;
+        temp$0[temp$3] = o;
+        return;
+    }
+
+    public void add(char)
+    {
+        invoker.sgx_invoker this;
+        char o;
+        char[] temp$0;
+        int temp$1, temp$2, temp$3;
+
+        this := @this: invoker.sgx_invoker;
+        o := @parameter0: char;
+        temp$0 = this.<invoker.sgx_invoker: char[] charArray>;
+        temp$1 = this.<invoker.sgx_invoker: int charTail>;
+        temp$2 = temp$1 + 1;
+        this.<invoker.sgx_invoker: int charTail> = temp$2;
+        temp$3 = temp$1;
+        temp$0[temp$3] = o;
+        return;
+    }
+
+    public void add(byte)
+    {
+        invoker.sgx_invoker this;
+        byte o;
+        byte[] temp$0;
+        int temp$1, temp$2, temp$3;
+
+        this := @this: invoker.sgx_invoker;
+        o := @parameter0: byte;
+        temp$0 = this.<invoker.sgx_invoker: byte[] byteArray>;
+        temp$1 = this.<invoker.sgx_invoker: int byteTail>;
+        temp$2 = temp$1 + 1;
+        this.<invoker.sgx_invoker: int byteTail> = temp$2;
+        temp$3 = temp$1;
+        temp$0[temp$3] = o;
+        return;
+    }
+
+    public void setCounter(long)
+    {
+        invoker.sgx_invoker this;
+        long counter;
+
+        this := @this: invoker.sgx_invoker;
+        counter := @parameter0: long;
+        this.<invoker.sgx_invoker: long counter> = counter;
+        return;
+    }
+
+    public boolean initenclave()
+    {
+        invoker.sgx_invoker this;
+        int temp$0;
+        boolean temp$1, temp$2;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = staticinvoke <invoker.sgx_invoker: int init()>();
+        if 1 == temp$0 goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$1 = 1;
+        return temp$1;
+
+     label1:
+        nop;
+        temp$2 = 0;
+        return temp$2;
+    }
+
+    public boolean closeenclave()
+    {
+        invoker.sgx_invoker this;
+        int temp$0;
+        boolean temp$1, temp$2;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = staticinvoke <invoker.sgx_invoker: int destroy()>();
+        if 0 == temp$0 goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$1 = 1;
+        return temp$1;
+
+     label1:
+        nop;
+        temp$2 = 0;
+        return temp$2;
+    }
+
+    public boolean initValueInEnclave(int[])
+    {
+        invoker.sgx_invoker this;
+        int[] intArray;
+        int temp$0, temp$1;
+        boolean temp$2, temp$3;
+
+        this := @this: invoker.sgx_invoker;
+        intArray := @parameter0: int[];
+        temp$0 = lengthof intArray;
+        temp$1 = staticinvoke <invoker.sgx_invoker: int initValue(int[],int)>(intArray, temp$0);
+        if 1 == temp$1 goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$2 = 1;
+        return temp$2;
+
+     label1:
+        nop;
+        temp$3 = 0;
+        return temp$3;
+    }
+
+    public void updateValueInEnclave()
+    {
+        invoker.sgx_invoker this;
+        int c_hash, temp$0, 'ret', temp$4, temp$6, temp$8, temp$10, temp$12, temp$14, temp$15, temp$19;
+        java.lang.String hitResultString, temp$1, temp$16, temp$23;
+        long temp$2;
+        int[] temp$3;
+        double[] temp$5;
+        float[] temp$7;
+        long[] temp$9;
+        char[] temp$11;
+        byte[] temp$13;
+        java.io.PrintStream temp$17, temp$20, temp$21, temp$24, temp$25;
+        java.lang.Integer temp$18;
+        java.lang.StringBuffer temp$22;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = virtualinvoke this.<invoker.sgx_invoker: int getArrayHash()>();
+        c_hash = temp$0;
+        temp$1 = virtualinvoke this.<invoker.sgx_invoker: java.lang.String check_cache(int)>(c_hash);
+        hitResultString = temp$1;
+        'ret' = -1;
+        if hitResultString == null goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$2 = this.<invoker.sgx_invoker: long counter>;
+        temp$3 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$4 = this.<invoker.sgx_invoker: int intTail>;
+        temp$5 = this.<invoker.sgx_invoker: double[] doubleArray>;
+        temp$6 = this.<invoker.sgx_invoker: int doubleTail>;
+        temp$7 = this.<invoker.sgx_invoker: float[] floatArray>;
+        temp$8 = this.<invoker.sgx_invoker: int floatTail>;
+        temp$9 = this.<invoker.sgx_invoker: long[] longArray>;
+        temp$10 = this.<invoker.sgx_invoker: int longTail>;
+        temp$11 = this.<invoker.sgx_invoker: char[] charArray>;
+        temp$12 = this.<invoker.sgx_invoker: int charTail>;
+        temp$13 = this.<invoker.sgx_invoker: byte[] byteArray>;
+        temp$14 = this.<invoker.sgx_invoker: int byteTail>;
+        temp$15 = staticinvoke <invoker.sgx_invoker: int commitUpdate(long,int[],int,double[],int,float[],int,long[],int,char[],int,byte[],int)>(temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, temp$10, temp$11, temp$12, temp$13, temp$14);
+        'ret' = temp$15;
+        temp$16 = staticinvoke <java.lang.Integer: java.lang.String toString(int)>('ret');
+        virtualinvoke this.<invoker.sgx_invoker: void updateCache(int,java.lang.String)>(c_hash, temp$16);
+        goto label2;
+
+     label1:
+        nop;
+        temp$17 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$17.<java.io.PrintStream: void println(java.lang.String)>("hit");
+        temp$18 = staticinvoke <java.lang.Integer: java.lang.Integer valueOf(java.lang.String)>(hitResultString);
+        temp$19 = virtualinvoke temp$18.<java.lang.Integer: int intValue()>();
+        'ret' = temp$19;
+
+     label2:
+        nop;
+        if 'ret' == 1 goto label3;
+
+        goto label4;
+
+     label3:
+        nop;
+        return;
+
+     label4:
+        nop;
+        if 'ret' == 0 goto label5;
+
+        goto label6;
+
+     label5:
+        nop;
+        temp$20 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$20.<java.io.PrintStream: void println(java.lang.String)>("error!");
+        goto label7;
+
+     label6:
+        nop;
+        temp$21 = <java.lang.System: java.io.PrintStream out>;
+        temp$22 = new java.lang.StringBuffer;
+        specialinvoke temp$22.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$22.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>("ret:");
+        virtualinvoke temp$22.<java.lang.StringBuffer: java.lang.StringBuffer append(int)>('ret');
+        temp$23 = virtualinvoke temp$22.<java.lang.StringBuffer: java.lang.String toString()>();
+        virtualinvoke temp$21.<java.io.PrintStream: void println(java.lang.String)>(temp$23);
+        temp$24 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$24.<java.io.PrintStream: void println(java.lang.String)>("error");
+        temp$25 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$25.<java.io.PrintStream: void println(java.lang.String)>("ret");
+        staticinvoke <java.lang.System: void exit(int)>(1);
+
+     label7:
+        nop;
+        return;
+    }
+
+    public int getArrayHash()
+    {
+        invoker.sgx_invoker this;
+        java.lang.String cache, temp$2, temp$8, temp$16, temp$24, temp$32, temp$40, temp$48;
+        java.lang.StringBuffer temp$0, temp$4, temp$12, temp$20, temp$28, temp$36, temp$44;
+        long temp$1, temp$31;
+        int loop, temp$3, temp$6, temp$7, temp$9, temp$10, loop, temp$11, temp$14, temp$17, temp$18, loop, temp$19, temp$22, temp$25, temp$26, loop, temp$27, temp$30, temp$33, temp$34, loop, temp$35, temp$38, temp$41, temp$42, loop, temp$43, temp$46, temp$49, temp$50, temp$51;
+        int[] temp$5;
+        double[] temp$13;
+        double temp$15;
+        float[] temp$21;
+        float temp$23;
+        long[] temp$29;
+        char[] temp$37;
+        char temp$39;
+        byte[] temp$45;
+        byte temp$47;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = new java.lang.StringBuffer;
+        specialinvoke temp$0.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$0.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>("");
+        temp$1 = this.<invoker.sgx_invoker: long counter>;
+        virtualinvoke temp$0.<java.lang.StringBuffer: java.lang.StringBuffer append(long)>(temp$1);
+        temp$2 = virtualinvoke temp$0.<java.lang.StringBuffer: java.lang.String toString()>();
+        cache = temp$2;
+        loop = 0;
+
+     label0:
+        nop;
+        temp$3 = this.<invoker.sgx_invoker: int intTail>;
+        if loop < temp$3 goto label1;
+
+        goto label2;
+
+     label1:
+        nop;
+        temp$4 = new java.lang.StringBuffer;
+        specialinvoke temp$4.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$4.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>(cache);
+        temp$5 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$6 = loop;
+        temp$7 = temp$5[temp$6];
+        virtualinvoke temp$4.<java.lang.StringBuffer: java.lang.StringBuffer append(int)>(temp$7);
+        temp$8 = virtualinvoke temp$4.<java.lang.StringBuffer: java.lang.String toString()>();
+        cache = temp$8;
+        nop;
+        temp$9 = loop;
+        temp$10 = temp$9 + 1;
+        loop = temp$10;
+        goto label0;
+
+     label2:
+        nop;
+        loop = 0;
+
+     label3:
+        nop;
+        temp$11 = this.<invoker.sgx_invoker: int doubleTail>;
+        if loop < temp$11 goto label4;
+
+        goto label5;
+
+     label4:
+        nop;
+        temp$12 = new java.lang.StringBuffer;
+        specialinvoke temp$12.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$12.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>(cache);
+        temp$13 = this.<invoker.sgx_invoker: double[] doubleArray>;
+        temp$14 = loop;
+        temp$15 = temp$13[temp$14];
+        virtualinvoke temp$12.<java.lang.StringBuffer: java.lang.StringBuffer append(double)>(temp$15);
+        temp$16 = virtualinvoke temp$12.<java.lang.StringBuffer: java.lang.String toString()>();
+        cache = temp$16;
+        nop;
+        temp$17 = loop;
+        temp$18 = temp$17 + 1;
+        loop = temp$18;
+        goto label3;
+
+     label5:
+        nop;
+        loop = 0;
+
+     label6:
+        nop;
+        temp$19 = this.<invoker.sgx_invoker: int floatTail>;
+        if loop < temp$19 goto label7;
+
+        goto label8;
+
+     label7:
+        nop;
+        temp$20 = new java.lang.StringBuffer;
+        specialinvoke temp$20.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$20.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>(cache);
+        temp$21 = this.<invoker.sgx_invoker: float[] floatArray>;
+        temp$22 = loop;
+        temp$23 = temp$21[temp$22];
+        virtualinvoke temp$20.<java.lang.StringBuffer: java.lang.StringBuffer append(float)>(temp$23);
+        temp$24 = virtualinvoke temp$20.<java.lang.StringBuffer: java.lang.String toString()>();
+        cache = temp$24;
+        nop;
+        temp$25 = loop;
+        temp$26 = temp$25 + 1;
+        loop = temp$26;
+        goto label6;
+
+     label8:
+        nop;
+        loop = 0;
+
+     label9:
+        nop;
+        temp$27 = this.<invoker.sgx_invoker: int longTail>;
+        if loop < temp$27 goto label10;
+
+        goto label11;
+
+     label10:
+        nop;
+        temp$28 = new java.lang.StringBuffer;
+        specialinvoke temp$28.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$28.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>(cache);
+        temp$29 = this.<invoker.sgx_invoker: long[] longArray>;
+        temp$30 = loop;
+        temp$31 = temp$29[temp$30];
+        virtualinvoke temp$28.<java.lang.StringBuffer: java.lang.StringBuffer append(long)>(temp$31);
+        temp$32 = virtualinvoke temp$28.<java.lang.StringBuffer: java.lang.String toString()>();
+        cache = temp$32;
+        nop;
+        temp$33 = loop;
+        temp$34 = temp$33 + 1;
+        loop = temp$34;
+        goto label9;
+
+     label11:
+        nop;
+        loop = 0;
+
+     label12:
+        nop;
+        temp$35 = this.<invoker.sgx_invoker: int charTail>;
+        if loop < temp$35 goto label13;
+
+        goto label14;
+
+     label13:
+        nop;
+        temp$36 = new java.lang.StringBuffer;
+        specialinvoke temp$36.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$36.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>(cache);
+        temp$37 = this.<invoker.sgx_invoker: char[] charArray>;
+        temp$38 = loop;
+        temp$39 = temp$37[temp$38];
+        virtualinvoke temp$36.<java.lang.StringBuffer: java.lang.StringBuffer append(char)>(temp$39);
+        temp$40 = virtualinvoke temp$36.<java.lang.StringBuffer: java.lang.String toString()>();
+        cache = temp$40;
+        nop;
+        temp$41 = loop;
+        temp$42 = temp$41 + 1;
+        loop = temp$42;
+        goto label12;
+
+     label14:
+        nop;
+        loop = 0;
+
+     label15:
+        nop;
+        temp$43 = this.<invoker.sgx_invoker: int byteTail>;
+        if loop < temp$43 goto label16;
+
+        goto label17;
+
+     label16:
+        nop;
+        temp$44 = new java.lang.StringBuffer;
+        specialinvoke temp$44.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$44.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>(cache);
+        temp$45 = this.<invoker.sgx_invoker: byte[] byteArray>;
+        temp$46 = loop;
+        temp$47 = temp$45[temp$46];
+        virtualinvoke temp$44.<java.lang.StringBuffer: java.lang.StringBuffer append(int)>(temp$47);
+        temp$48 = virtualinvoke temp$44.<java.lang.StringBuffer: java.lang.String toString()>();
+        cache = temp$48;
+        nop;
+        temp$49 = loop;
+        temp$50 = temp$49 + 1;
+        loop = temp$50;
+        goto label15;
+
+     label17:
+        nop;
+        temp$51 = virtualinvoke cache.<java.lang.String: int hashCode()>();
+        return temp$51;
+    }
+
+    public boolean getBooleanValue()
+    {
+        invoker.sgx_invoker this;
+        int c_hash, temp$0, 'ret', temp$4, temp$6, temp$8, temp$10, temp$12, temp$14, temp$15, temp$19;
+        java.lang.String hitResultString, temp$1, temp$16, temp$24;
+        long temp$2;
+        int[] temp$3;
+        double[] temp$5;
+        float[] temp$7;
+        long[] temp$9;
+        char[] temp$11;
+        byte[] temp$13;
+        java.io.PrintStream temp$17, temp$22, temp$25, temp$26;
+        java.lang.Integer temp$18;
+        boolean temp$20, temp$21, temp$27;
+        java.lang.StringBuffer temp$23;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = virtualinvoke this.<invoker.sgx_invoker: int getArrayHash()>();
+        c_hash = temp$0;
+        temp$1 = virtualinvoke this.<invoker.sgx_invoker: java.lang.String check_cache(int)>(c_hash);
+        hitResultString = temp$1;
+        'ret' = -1;
+        if hitResultString == null goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$2 = this.<invoker.sgx_invoker: long counter>;
+        temp$3 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$4 = this.<invoker.sgx_invoker: int intTail>;
+        temp$5 = this.<invoker.sgx_invoker: double[] doubleArray>;
+        temp$6 = this.<invoker.sgx_invoker: int doubleTail>;
+        temp$7 = this.<invoker.sgx_invoker: float[] floatArray>;
+        temp$8 = this.<invoker.sgx_invoker: int floatTail>;
+        temp$9 = this.<invoker.sgx_invoker: long[] longArray>;
+        temp$10 = this.<invoker.sgx_invoker: int longTail>;
+        temp$11 = this.<invoker.sgx_invoker: char[] charArray>;
+        temp$12 = this.<invoker.sgx_invoker: int charTail>;
+        temp$13 = this.<invoker.sgx_invoker: byte[] byteArray>;
+        temp$14 = this.<invoker.sgx_invoker: int byteTail>;
+        temp$15 = staticinvoke <invoker.sgx_invoker: int commitBranch(long,int[],int,double[],int,float[],int,long[],int,char[],int,byte[],int)>(temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, temp$10, temp$11, temp$12, temp$13, temp$14);
+        'ret' = temp$15;
+        temp$16 = staticinvoke <java.lang.Integer: java.lang.String toString(int)>('ret');
+        virtualinvoke this.<invoker.sgx_invoker: void updateCache(int,java.lang.String)>(c_hash, temp$16);
+        goto label2;
+
+     label1:
+        nop;
+        temp$17 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$17.<java.io.PrintStream: void println(java.lang.String)>("hit");
+        temp$18 = staticinvoke <java.lang.Integer: java.lang.Integer valueOf(java.lang.String)>(hitResultString);
+        temp$19 = virtualinvoke temp$18.<java.lang.Integer: int intValue()>();
+        'ret' = temp$19;
+
+     label2:
+        nop;
+        if 'ret' == 1 goto label3;
+
+        goto label4;
+
+     label3:
+        nop;
+        temp$20 = 1;
+        return temp$20;
+
+     label4:
+        nop;
+        if 'ret' == 0 goto label5;
+
+        goto label6;
+
+     label5:
+        nop;
+        temp$21 = 0;
+        return temp$21;
+
+     label6:
+        nop;
+        temp$22 = <java.lang.System: java.io.PrintStream out>;
+        temp$23 = new java.lang.StringBuffer;
+        specialinvoke temp$23.<java.lang.StringBuffer: void <init>()>();
+        virtualinvoke temp$23.<java.lang.StringBuffer: java.lang.StringBuffer append(java.lang.Object)>("ret:");
+        virtualinvoke temp$23.<java.lang.StringBuffer: java.lang.StringBuffer append(int)>('ret');
+        temp$24 = virtualinvoke temp$23.<java.lang.StringBuffer: java.lang.String toString()>();
+        virtualinvoke temp$22.<java.io.PrintStream: void println(java.lang.String)>(temp$24);
+        temp$25 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$25.<java.io.PrintStream: void println(java.lang.String)>("error");
+        temp$26 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$26.<java.io.PrintStream: void println(java.lang.String)>("ret");
+        staticinvoke <java.lang.System: void exit(int)>(1);
+        temp$27 = 0;
+        return temp$27;
+    }
+
+    public int getIntValue()
+    {
+        invoker.sgx_invoker this;
+        int c_hash, temp$0, 'ret', temp$4, temp$6, temp$8, temp$10, temp$12, temp$14, temp$15, temp$19;
+        java.lang.String hit, temp$1, temp$16;
+        long temp$2;
+        int[] temp$3;
+        double[] temp$5;
+        float[] temp$7;
+        long[] temp$9;
+        char[] temp$11;
+        byte[] temp$13;
+        java.io.PrintStream temp$17;
+        java.lang.Integer temp$18;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = virtualinvoke this.<invoker.sgx_invoker: int getArrayHash()>();
+        c_hash = temp$0;
+        temp$1 = virtualinvoke this.<invoker.sgx_invoker: java.lang.String check_cache(int)>(c_hash);
+        hit = temp$1;
+        'ret' = -1;
+        if hit == null goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$2 = this.<invoker.sgx_invoker: long counter>;
+        temp$3 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$4 = this.<invoker.sgx_invoker: int intTail>;
+        temp$5 = this.<invoker.sgx_invoker: double[] doubleArray>;
+        temp$6 = this.<invoker.sgx_invoker: int doubleTail>;
+        temp$7 = this.<invoker.sgx_invoker: float[] floatArray>;
+        temp$8 = this.<invoker.sgx_invoker: int floatTail>;
+        temp$9 = this.<invoker.sgx_invoker: long[] longArray>;
+        temp$10 = this.<invoker.sgx_invoker: int longTail>;
+        temp$11 = this.<invoker.sgx_invoker: char[] charArray>;
+        temp$12 = this.<invoker.sgx_invoker: int charTail>;
+        temp$13 = this.<invoker.sgx_invoker: byte[] byteArray>;
+        temp$14 = this.<invoker.sgx_invoker: int byteTail>;
+        temp$15 = staticinvoke <invoker.sgx_invoker: int commitInt(long,int[],int,double[],int,float[],int,long[],int,char[],int,byte[],int)>(temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, temp$10, temp$11, temp$12, temp$13, temp$14);
+        'ret' = temp$15;
+        temp$16 = staticinvoke <java.lang.String: java.lang.String valueOf(int)>('ret');
+        virtualinvoke this.<invoker.sgx_invoker: void updateCache(int,java.lang.String)>(c_hash, temp$16);
+        goto label2;
+
+     label1:
+        nop;
+        temp$17 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$17.<java.io.PrintStream: void println(java.lang.String)>("hit");
+        temp$18 = staticinvoke <java.lang.Integer: java.lang.Integer valueOf(java.lang.String)>(hit);
+        temp$19 = virtualinvoke temp$18.<java.lang.Integer: int intValue()>();
+        'ret' = temp$19;
+
+     label2:
+        nop;
+        return 'ret';
+    }
+
+    public float getFloatValue()
+    {
+        invoker.sgx_invoker this;
+        int c_hash, temp$0, temp$4, temp$6, temp$8, temp$10, temp$12, temp$14;
+        java.lang.String hit, temp$1, temp$16;
+        float 'ret', temp$15, temp$19;
+        long temp$2;
+        int[] temp$3;
+        double[] temp$5;
+        float[] temp$7;
+        long[] temp$9;
+        char[] temp$11;
+        byte[] temp$13;
+        java.io.PrintStream temp$17;
+        java.lang.Float temp$18;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = virtualinvoke this.<invoker.sgx_invoker: int getArrayHash()>();
+        c_hash = temp$0;
+        temp$1 = virtualinvoke this.<invoker.sgx_invoker: java.lang.String check_cache(int)>(c_hash);
+        hit = temp$1;
+        'ret' = -1.0F;
+        if hit == null goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$2 = this.<invoker.sgx_invoker: long counter>;
+        temp$3 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$4 = this.<invoker.sgx_invoker: int intTail>;
+        temp$5 = this.<invoker.sgx_invoker: double[] doubleArray>;
+        temp$6 = this.<invoker.sgx_invoker: int doubleTail>;
+        temp$7 = this.<invoker.sgx_invoker: float[] floatArray>;
+        temp$8 = this.<invoker.sgx_invoker: int floatTail>;
+        temp$9 = this.<invoker.sgx_invoker: long[] longArray>;
+        temp$10 = this.<invoker.sgx_invoker: int longTail>;
+        temp$11 = this.<invoker.sgx_invoker: char[] charArray>;
+        temp$12 = this.<invoker.sgx_invoker: int charTail>;
+        temp$13 = this.<invoker.sgx_invoker: byte[] byteArray>;
+        temp$14 = this.<invoker.sgx_invoker: int byteTail>;
+        temp$15 = staticinvoke <invoker.sgx_invoker: float commitFloat(long,int[],int,double[],int,float[],int,long[],int,char[],int,byte[],int)>(temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, temp$10, temp$11, temp$12, temp$13, temp$14);
+        'ret' = temp$15;
+        temp$16 = staticinvoke <java.lang.String: java.lang.String valueOf(float)>('ret');
+        virtualinvoke this.<invoker.sgx_invoker: void updateCache(int,java.lang.String)>(c_hash, temp$16);
+        goto label2;
+
+     label1:
+        nop;
+        temp$17 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$17.<java.io.PrintStream: void println(java.lang.String)>("hit");
+        temp$18 = staticinvoke <java.lang.Float: java.lang.Float valueOf(java.lang.String)>(hit);
+        temp$19 = virtualinvoke temp$18.<java.lang.Float: float floatValue()>();
+        'ret' = temp$19;
+
+     label2:
+        nop;
+        return 'ret';
+    }
+
+    public double getDoubleValue()
+    {
+        invoker.sgx_invoker this;
+        int c_hash, temp$0, temp$4, temp$6, temp$8, temp$10, temp$12, temp$14;
+        java.lang.String hit, temp$1, temp$16;
+        double 'ret', temp$15, temp$19;
+        long temp$2;
+        int[] temp$3;
+        double[] temp$5;
+        float[] temp$7;
+        long[] temp$9;
+        char[] temp$11;
+        byte[] temp$13;
+        java.io.PrintStream temp$17;
+        java.lang.Double temp$18;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = virtualinvoke this.<invoker.sgx_invoker: int getArrayHash()>();
+        c_hash = temp$0;
+        temp$1 = virtualinvoke this.<invoker.sgx_invoker: java.lang.String check_cache(int)>(c_hash);
+        hit = temp$1;
+        'ret' = -1.0;
+        if hit == null goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$2 = this.<invoker.sgx_invoker: long counter>;
+        temp$3 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$4 = this.<invoker.sgx_invoker: int intTail>;
+        temp$5 = this.<invoker.sgx_invoker: double[] doubleArray>;
+        temp$6 = this.<invoker.sgx_invoker: int doubleTail>;
+        temp$7 = this.<invoker.sgx_invoker: float[] floatArray>;
+        temp$8 = this.<invoker.sgx_invoker: int floatTail>;
+        temp$9 = this.<invoker.sgx_invoker: long[] longArray>;
+        temp$10 = this.<invoker.sgx_invoker: int longTail>;
+        temp$11 = this.<invoker.sgx_invoker: char[] charArray>;
+        temp$12 = this.<invoker.sgx_invoker: int charTail>;
+        temp$13 = this.<invoker.sgx_invoker: byte[] byteArray>;
+        temp$14 = this.<invoker.sgx_invoker: int byteTail>;
+        temp$15 = staticinvoke <invoker.sgx_invoker: double commitDouble(long,int[],int,double[],int,float[],int,long[],int,char[],int,byte[],int)>(temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, temp$10, temp$11, temp$12, temp$13, temp$14);
+        'ret' = temp$15;
+        temp$16 = staticinvoke <java.lang.String: java.lang.String valueOf(double)>('ret');
+        virtualinvoke this.<invoker.sgx_invoker: void updateCache(int,java.lang.String)>(c_hash, temp$16);
+        goto label2;
+
+     label1:
+        nop;
+        temp$17 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$17.<java.io.PrintStream: void println(java.lang.String)>("hit");
+        temp$18 = staticinvoke <java.lang.Double: java.lang.Double valueOf(java.lang.String)>(hit);
+        temp$19 = virtualinvoke temp$18.<java.lang.Double: double doubleValue()>();
+        'ret' = temp$19;
+
+     label2:
+        nop;
+        return 'ret';
+    }
+
+    public char getCharValue()
+    {
+        invoker.sgx_invoker this;
+        int c_hash, temp$0, temp$4, temp$6, temp$8, temp$10, temp$12, temp$14;
+        java.lang.String hit, temp$1, temp$16;
+        char 'ret', temp$15, temp$18;
+        long temp$2;
+        int[] temp$3;
+        double[] temp$5;
+        float[] temp$7;
+        long[] temp$9;
+        char[] temp$11;
+        byte[] temp$13;
+        java.io.PrintStream temp$17;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = virtualinvoke this.<invoker.sgx_invoker: int getArrayHash()>();
+        c_hash = temp$0;
+        temp$1 = virtualinvoke this.<invoker.sgx_invoker: java.lang.String check_cache(int)>(c_hash);
+        hit = temp$1;
+        if hit == null goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$2 = this.<invoker.sgx_invoker: long counter>;
+        temp$3 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$4 = this.<invoker.sgx_invoker: int intTail>;
+        temp$5 = this.<invoker.sgx_invoker: double[] doubleArray>;
+        temp$6 = this.<invoker.sgx_invoker: int doubleTail>;
+        temp$7 = this.<invoker.sgx_invoker: float[] floatArray>;
+        temp$8 = this.<invoker.sgx_invoker: int floatTail>;
+        temp$9 = this.<invoker.sgx_invoker: long[] longArray>;
+        temp$10 = this.<invoker.sgx_invoker: int longTail>;
+        temp$11 = this.<invoker.sgx_invoker: char[] charArray>;
+        temp$12 = this.<invoker.sgx_invoker: int charTail>;
+        temp$13 = this.<invoker.sgx_invoker: byte[] byteArray>;
+        temp$14 = this.<invoker.sgx_invoker: int byteTail>;
+        temp$15 = staticinvoke <invoker.sgx_invoker: char commitChar(long,int[],int,double[],int,float[],int,long[],int,char[],int,byte[],int)>(temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, temp$10, temp$11, temp$12, temp$13, temp$14);
+        'ret' = temp$15;
+        temp$16 = staticinvoke <java.lang.String: java.lang.String valueOf(char)>('ret');
+        virtualinvoke this.<invoker.sgx_invoker: void updateCache(int,java.lang.String)>(c_hash, temp$16);
+        goto label2;
+
+     label1:
+        nop;
+        temp$17 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$17.<java.io.PrintStream: void println(java.lang.String)>("hit");
+        temp$18 = virtualinvoke hit.<java.lang.String: char charAt(int)>(0);
+        'ret' = temp$18;
+
+     label2:
+        nop;
+        return 'ret';
+    }
+
+    public byte getByteValue() throws java.io.UnsupportedEncodingException
+    {
+        invoker.sgx_invoker this;
+        int c_hash, temp$0, temp$4, temp$6, temp$8, temp$10, temp$12, temp$14, temp$16, temp$21;
+        java.lang.String hit, temp$1, temp$17;
+        byte 'ret', temp$15, temp$22;
+        long temp$2;
+        int[] temp$3;
+        double[] temp$5;
+        float[] temp$7;
+        long[] temp$9;
+        char[] temp$11;
+        byte[] temp$13, temp$19, temp$20;
+        java.io.PrintStream temp$18;
+
+        this := @this: invoker.sgx_invoker;
+        temp$0 = virtualinvoke this.<invoker.sgx_invoker: int getArrayHash()>();
+        c_hash = temp$0;
+        temp$1 = virtualinvoke this.<invoker.sgx_invoker: java.lang.String check_cache(int)>(c_hash);
+        hit = temp$1;
+        if hit == null goto label0;
+
+        goto label1;
+
+     label0:
+        nop;
+        temp$2 = this.<invoker.sgx_invoker: long counter>;
+        temp$3 = this.<invoker.sgx_invoker: int[] intArray>;
+        temp$4 = this.<invoker.sgx_invoker: int intTail>;
+        temp$5 = this.<invoker.sgx_invoker: double[] doubleArray>;
+        temp$6 = this.<invoker.sgx_invoker: int doubleTail>;
+        temp$7 = this.<invoker.sgx_invoker: float[] floatArray>;
+        temp$8 = this.<invoker.sgx_invoker: int floatTail>;
+        temp$9 = this.<invoker.sgx_invoker: long[] longArray>;
+        temp$10 = this.<invoker.sgx_invoker: int longTail>;
+        temp$11 = this.<invoker.sgx_invoker: char[] charArray>;
+        temp$12 = this.<invoker.sgx_invoker: int charTail>;
+        temp$13 = this.<invoker.sgx_invoker: byte[] byteArray>;
+        temp$14 = this.<invoker.sgx_invoker: int byteTail>;
+        temp$15 = staticinvoke <invoker.sgx_invoker: byte commitByte(long,int[],int,double[],int,float[],int,long[],int,char[],int,byte[],int)>(temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, temp$10, temp$11, temp$12, temp$13, temp$14);
+        'ret' = temp$15;
+        temp$16 = (int) 'ret';
+        temp$17 = staticinvoke <java.lang.String: java.lang.String valueOf(int)>(temp$16);
+        virtualinvoke this.<invoker.sgx_invoker: void updateCache(int,java.lang.String)>(c_hash, temp$17);
+        goto label2;
+
+     label1:
+        nop;
+        temp$18 = <java.lang.System: java.io.PrintStream out>;
+        virtualinvoke temp$18.<java.io.PrintStream: void println(java.lang.String)>("hit");
+        temp$19 = virtualinvoke hit.<java.lang.String: byte[] getBytes(java.lang.String)>(hit);
+        temp$20 = temp$19;
+        temp$21 = 0;
+        temp$22 = temp$20[temp$21];
+        'ret' = temp$22;
+
+     label2:
+        nop;
+        return 'ret';
+    }
+
+    public void <init>()
+    {
+        invoker.sgx_invoker this;
+        int temp$0, temp$2, temp$3, temp$5, temp$6, temp$8, temp$9, temp$11, temp$12, temp$14, temp$15, temp$17, temp$18, temp$20;
+        java.lang.Object[] temp$1;
+        int[] temp$4;
+        double[] temp$7;
+        float[] temp$10;
+        long[] temp$13;
+        char[] temp$16;
+        byte[] temp$19;
+        long temp$21;
+
+        this := @this: invoker.sgx_invoker;
+        specialinvoke this.<java.lang.Object: void <init>()>();
+        temp$0 = <invoker.sgx_invoker: int N>;
+        temp$1 = newarray (java.lang.Object)[temp$0];
+        this.<invoker.sgx_invoker: java.lang.Object[] objArray> = temp$1;
+        temp$2 = 0;
+        this.<invoker.sgx_invoker: int objTail> = temp$2;
+        temp$3 = <invoker.sgx_invoker: int N>;
+        temp$4 = newarray (int)[temp$3];
+        this.<invoker.sgx_invoker: int[] intArray> = temp$4;
+        temp$5 = 0;
+        this.<invoker.sgx_invoker: int intTail> = temp$5;
+        temp$6 = <invoker.sgx_invoker: int N>;
+        temp$7 = newarray (double)[temp$6];
+        this.<invoker.sgx_invoker: double[] doubleArray> = temp$7;
+        temp$8 = 0;
+        this.<invoker.sgx_invoker: int doubleTail> = temp$8;
+        temp$9 = <invoker.sgx_invoker: int N>;
+        temp$10 = newarray (float)[temp$9];
+        this.<invoker.sgx_invoker: float[] floatArray> = temp$10;
+        temp$11 = 0;
+        this.<invoker.sgx_invoker: int floatTail> = temp$11;
+        temp$12 = <invoker.sgx_invoker: int N>;
+        temp$13 = newarray (long)[temp$12];
+        this.<invoker.sgx_invoker: long[] longArray> = temp$13;
+        temp$14 = 0;
+        this.<invoker.sgx_invoker: int longTail> = temp$14;
+        temp$15 = <invoker.sgx_invoker: int N>;
+        temp$16 = newarray (char)[temp$15];
+        this.<invoker.sgx_invoker: char[] charArray> = temp$16;
+        temp$17 = 0;
+        this.<invoker.sgx_invoker: int charTail> = temp$17;
+        temp$18 = <invoker.sgx_invoker: int N>;
+        temp$19 = newarray (byte)[temp$18];
+        this.<invoker.sgx_invoker: byte[] byteArray> = temp$19;
+        temp$20 = 0;
+        this.<invoker.sgx_invoker: int byteTail> = temp$20;
+        temp$21 = -1L;
+        this.<invoker.sgx_invoker: long counter> = temp$21;
+        return;
+    }
+}
