@@ -1,4 +1,4 @@
-#export LD_LIBRARY_PATH=/opt/intel/sgxsdk/lib64:/home/xidian/CFHiderNew/SGX/libSGX.so
+#export LD_LIBRARY_PATH=/opt/intel/sgxsdk/lib64
 SGX_SDK ?= /opt/intel/sgxsdk
 SGX_MODE ?= HW
 SGX_ARCH ?= x64

@@ -686,7 +686,7 @@ int SGX_CDECL main(int argc, char *argv[])
 {
 
 initialize_enclave();
-
+/*
     int int_array[100] = {0,1,2,3,4,5,6,7,8};
     long long_array[100] = {0,1,2,3,4,5,6,7,8};
     double double_array[100] = { 0.1,1.1,2.1,3.1,4.1,5.1,6.1,7.1,8.1,9.1 };
@@ -697,8 +697,8 @@ initialize_enclave();
 int k[] = {10,10,10,10,10,10,10};
 int re;
 encall_table_load(global_eid,&re);
-printf("encall_table_load is ok!!!\n");
 encall_varible(global_eid,k,7);
+
 int re_i=999;
 double re_d=0.0;
 char re_c=' ';
@@ -721,7 +721,7 @@ encall_switch_type_i(global_eid,&re_i,6,int_array,10,double_array,10,float_array
 for(int i=1;i<10;i++){
 	encall_switch_type_i(global_eid,&re_i,i,int_array,10,double_array,10,float_array,10,char_array,10,long_array,10,byte_array,10);
 }
-
+*/
 destroy_enclave();
 
 return 0;
