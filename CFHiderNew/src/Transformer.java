@@ -62,7 +62,7 @@ public class Transformer
     final static double ratio = 0.5;
     
 	static Writer getWriter(){
-		String filename = "/tmp/counter";
+		String filename = "/home/xidian/CFHiderNew/MatrixEncrypt/SGXindex";
 	    if(indexWriter==null){
 			try{
 				indexWriter = new PrintWriter(filename, "UTF-8");
@@ -87,7 +87,7 @@ public class Transformer
 	}
 
 	public static void indexwriter(String content) {
-		String file="/tmp/SGXindex";
+		String file="/home/xidian/CFHiderNew/MatrixEncrypt/SGXindex";
 		BufferedWriter out = null;
 		try {
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true)));
