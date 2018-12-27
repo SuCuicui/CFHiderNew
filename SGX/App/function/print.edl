@@ -1,0 +1,15 @@
+enclave {
+    
+    untrusted {
+	
+    void ocall_print_string([in, string] const char *str);
+	void ocall_print_int(int str);
+	void ocall_print_long(long str);
+	void ocall_file_write([user_check]char* file,[user_check]char* buf,int len);
+	void ocall_file_add([user_check]char* file,[user_check]char* buf,int len);
+	void ocall_file_read([in,string]char* file,[in,out,size=400]int* buf,[in,out,size=8]long* start)allow(encall_read_line);
+	void ocall_file_getline([user_check]char* file,[user_check]char* buf,[user_check]long* line_num);
+	//void ocall_file_read([user_check]char* file,[user_check]int* buf,[user_check]int* start);
+	//void ocall_load_hash(void);
+    };
+};

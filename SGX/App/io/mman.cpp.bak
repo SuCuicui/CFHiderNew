@@ -1,0 +1,17 @@
+#include <sys/mman.h>
+#include "Enclave_u.h"
+
+void *ocall_mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset){
+	return mmap(addr, length, prot, flags, fd, offset);
+}
+int ocall_munmap(void *addr, size_t length){
+	return munmap(addr, length);
+}
+
+void *mremap_noaddress(void *old_address, size_t old_size, size_t new_size, int flags){
+	return mremap(old_address, old_size, new_size, flags);
+}
+void *mremap_address(void *old_address, size_t old_size, size_t new_size, 
+								int flags, void *new_address /* void *new_address */){
+	return mremap(old_address, old_size, new_size, flags, new_address);
+}

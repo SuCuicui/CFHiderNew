@@ -1,0 +1,12 @@
+enclave {
+	//include "../Enclave/vfslib/types.h"
+	
+	untrusted {
+        void *ocall_mmap([in, size=length]void *addr, size_t length, int prot, int flags, int fd, off_t offset);
+		int ocall_munmap([in, size=length]void *addr, size_t length);
+		void *mremap_noaddress([in, size=old_size]void *old_address, size_t old_size, size_t new_size, int flags);
+		void *mremap_address([in, size=old_size]void *old_address, size_t old_size, size_t new_size,
+		int flags, [in, size=new_size]void *new_address /* void *new_address */);
+    };
+
+};

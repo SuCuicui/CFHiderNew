@@ -1,0 +1,11 @@
+enclave {
+	//include "../Enclave/vfslib/types.h"
+	
+	untrusted {
+        int ocall_stat([in, string]const char *pathname, [out]struct stat *buf);
+        int ocall_fstat(int fd, [out]struct stat *buf);
+        int ocall_fchmod(int fd, unsigned int mode);
+        int ocall_mkdir([in,string]const char* pathname, mode_t mode);
+    };
+
+};
