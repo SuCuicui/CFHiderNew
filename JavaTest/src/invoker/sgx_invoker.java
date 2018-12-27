@@ -22,7 +22,7 @@ public class sgx_invoker{
 	
 	static {
 		try{
-			System.out.println("invoker"+System.getProperty("java.library.path"));
+//			System.out.println("invoker"+System.getProperty("java.library.path"));
 			System.loadLibrary("SGX");
 		}
 		catch (Exception e) {
