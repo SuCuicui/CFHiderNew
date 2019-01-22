@@ -93,7 +93,7 @@
 <attribute>
 <srcPos sline="0" eline="0" spos="0" epos="0"/>
 <jmpPos sline="0" eline="0" spos="0" epos="0"/>
-<text info="[hashCode]" aType="ParamNamesTag"/>
+<text info="[]" aType="ParamNamesTag"/>
 </attribute>
 <attribute>
 <srcPos sline="0" eline="0" spos="0" epos="0"/>

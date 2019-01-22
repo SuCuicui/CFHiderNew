@@ -7,7 +7,7 @@
 package test;
 public class BinarySearch { 
 	public static void main(String[] args) {
-		System.out.println("main(): ");
+//		System.out.println("main(): ");
 		int[] src=new int[100];//1000000
 		for(int i=0;i<100;i++){//1000000
 			src[i] = i;
@@ -26,7 +26,7 @@ public class BinarySearch {
      * @return des的数组下标，没找到返回-1
      */ 
    public static int binarySearch(int[] srcArray, int des){ 
-	   System.out.println("binarySearch(int[], int): ");
+//	   System.out.println("binarySearch(int[], int): ");
         int low = 0; 
         int high = srcArray.length-1; 
         while(low <= high) { 

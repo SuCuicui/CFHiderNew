@@ -185,7 +185,7 @@ JNIEXPORT jint JNICALL Java_invoker_sgx_1invoker_commitInt
 		print_error_message(ret);
 	}
 	
-	//printf("reint rei=%d\n",rei);
+	// printf("reint rei=%d\n",rei);
 	return rei;
 }
 /**
@@ -681,12 +681,7 @@ JNIEXPORT jint JNICALL Java_invoker_sgx_1invoker_initValue
 	return 1;
 }
 
-JNIEXPORT jint JNICALL Java_invoker_sgx_1invoker_deleteValue
-  (JNIEnv *env, jclass obj){
-	int red;
-	encall_deleteValue(global_eid,&red);
-	return red;
-}
+
 
 
 int SGX_CDECL main(int argc, char *argv[])
@@ -704,12 +699,11 @@ initialize_enclave();
 int k[] = {10,10,10,10,10,10,10};
 int re;
 encall_table_load(global_eid,&re);
+encall_varible(global_eid,k,7);
 
 int re_i=999;
 double re_d=0.0;
 char re_c=' ';
-
-int red;
 
 encall_switch_type_c(global_eid,&re_c,0,int_array,10,double_array,10,float_array,10,char_array,10,long_array,10,byte_array,10);
 //printf("re_c=%c\n",re_c);
@@ -726,14 +720,10 @@ encall_switch_type_i(global_eid,&re_i,5,int_array,10,double_array,10,float_array
 encall_switch_type_i(global_eid,&re_i,6,int_array,10,double_array,10,float_array,10,char_array,10,long_array,10,byte_array,10);
 //printf("re_i6=%d\n",re_i);
 
-encall_varible(global_eid,k,7);
-encall_switch_type_i(global_eid,&re_i,1,int_array,10,double_array,10,float_array,10,char_array,10,long_array,10,byte_array,10);
-for(int i=2;i<5;i++){
-	encall_varible(global_eid,k,7);
+for(int i=1;i<10;i++){
 	encall_switch_type_i(global_eid,&re_i,i,int_array,10,double_array,10,float_array,10,char_array,10,long_array,10,byte_array,10);
-	encall_deleteValue(global_eid,&red);
 }
-encall_deleteValue(global_eid,&red);*/
+*/
 destroy_enclave();
 
 return 0;

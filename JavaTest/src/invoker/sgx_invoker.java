@@ -19,6 +19,7 @@ public class sgx_invoker{
 	public static native int commitUpdate(long counter, int[] intArray, int intTail, double[] doubleArray, int doubleTail,float[] floatArray, int floatTail, long[] longArray, int longTail, char[] charArray,int charTail, byte[] byteArray,int byteTail);
 
 	public static native int initValue(int[] intArray2, int length);
+	public static native int deleteValue();
 	
 	static {
 		try{
@@ -161,6 +162,7 @@ public class sgx_invoker{
 
 	public void add(int o){
 		intArray[intTail++] = o;
+//		System.out.println(String.valueOf(o)+" is added to list;");
 	}
 	
 	public void add(double o){
@@ -199,28 +201,45 @@ public class sgx_invoker{
 	}
 
 	public boolean initValueInEnclave(int[] intArray){
-		if(1==initValue(intArray, intArray.length))
-		return true;
+		if(1==initValue(intArray, intArray.length)){
+//			System.out.println("initValueInEnclave(Array) is okay!");
+			return true;
+		}
 		else
-		return false;
+			return false;
 	}
 	
+	public boolean deleteValueInEnclave(){
+		if(1==deleteValue()){
+//			System.out.println("deleteValueInEnclave( is okay!");
+			return true;
+		}
+		else
+			return false;
+//		return true;
+	}
+	
+	
 	public void updateValueInEnclave(){
-		int c_hash=getArrayHash();
-		String hitResultString=check_cache(c_hash);
+		// int c_hash=getArrayHash();
+		// String hitResultString=check_cache(c_hash);
 		
 		int ret = -1;
-		if(hitResultString == null){
+//		if(hitResultString == null){
+//			System.out.println("cache not hit! Start to compute in Enclave to updateValueInEnclave!");
+			// System.out.println(counter);
 			ret = commitUpdate(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-			updateCache(c_hash, Integer.toString(ret));
-		}
-		else {
-			System.out.println("hit");
-			ret = Integer.valueOf(hitResultString);			
-		}
+//			updateCache(c_hash, Integer.toString(ret));
+//		}
+//		else {
+//			System.out.println("hit");
+//			ret = Integer.valueOf(hitResultString);			
+//		}
 		
-		if(ret == 1)
+		if(ret == 1){
+//			 System.out.println("updateValueInEnclave is okay!");
 			return;
+		}
 		else if(ret == 0)
 			System.out.println("error!");
 		else{
@@ -258,21 +277,25 @@ public class sgx_invoker{
 	}
 	
 	public boolean getBooleanValue(){ 
-		int c_hash=getArrayHash();
-		String hitResultString=check_cache(c_hash);
+//		int c_hash=getArrayHash();
+//		String hitResultString=check_cache(c_hash);
 		
 		int ret = -1;
-		if(hitResultString == null){
+//		if(hitResultString == null){
+//			System.out.println("cache not hit! Start to compute in Enclave to getBooleanValue!");
+//			System.out.println(counter);
 			ret = commitBranch(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-			updateCache(c_hash, Integer.toString(ret));
-		}
-		else {
-			System.out.println("hit");
-			ret = Integer.valueOf(hitResultString);			
-		}
+//			updateCache(c_hash, Integer.toString(ret));
+//		}
+//		else {
+//			System.out.println("hit");
+//			ret = Integer.valueOf(hitResultString);			
+//		}
 		
-		if(ret == 1)
+		if(ret == 1){
+//			System.out.println("getBooleanValue is okay!");
 			return true;
+		}
 		else if(ret == 0)
 			return false;
 		else{
@@ -287,18 +310,22 @@ public class sgx_invoker{
 	}
 	
 	public int getIntValue(){ 
-		int c_hash=getArrayHash();
-		String hit=check_cache(c_hash);
+//		int c_hash=getArrayHash();
+//		String hit=check_cache(c_hash);
 		
 		int ret = -1;
-		if(hit==null){
+//		if(hit==null){
+//			System.out.println("cache not hit! Start to compute in Enclave to getIntValue!");
+//			System.out.println(counter);
 			 ret = commitInt(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-			updateCache(c_hash, String.valueOf(ret));
-		}
-		else {
-			System.out.println("hit");
-			ret = Integer.valueOf(hit);			
-		}
+//			updateCache(c_hash, String.valueOf(ret));
+//		}
+//		else {
+//			System.out.println("hit");
+//			ret = Integer.valueOf(hit);			
+//		}
+//		if(ret !=-1)
+//			  System.out.println("getIntValue is okay!");
 		return ret;
 	}
 
@@ -311,7 +338,7 @@ public class sgx_invoker{
 			updateCache(c_hash, String.valueOf(ret));
 		}
 		else {
-			System.out.println("hit");
+//			System.out.println("hit");
 			ret = Float.valueOf(hit);			
 		}
 		
@@ -332,7 +359,7 @@ public class sgx_invoker{
 			updateCache(c_hash, String.valueOf(ret));
 		}
 		else {
-			System.out.println("hit");
+//			System.out.println("hit");
 			ret = Double.valueOf(hit);			
 		}
 		return ret;
@@ -348,7 +375,7 @@ public class sgx_invoker{
 			updateCache(c_hash, String.valueOf(ret));
 		}
 		else {
-			System.out.println("hit");
+//			System.out.println("hit");
 			ret = hit.charAt(0);			
 		}
 		return ret;
@@ -364,7 +391,7 @@ public class sgx_invoker{
 			 updateCache(c_hash, String.valueOf(ret));
 		}
 		else {
-			System.out.println("hit");
+//			System.out.println("hit");
 			ret = hit.getBytes(hit)[0];
 		}
 		return ret;

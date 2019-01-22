@@ -34,6 +34,7 @@ import soot.jimple.LongConstant;
 import soot.jimple.NewArrayExpr;
 import soot.jimple.NopStmt;
 import soot.jimple.NullConstant;
+import soot.jimple.ParameterRef;
 import soot.jimple.Ref;
 import soot.jimple.ReturnStmt;
 import soot.jimple.SpecialInvokeExpr;
@@ -121,8 +122,11 @@ public class Transformer
 		String declaredClassName = "";
     	declaredClassName = aBody.getMethod().getDeclaringClass().toString();
 		String declaredFunction = aBody.getMethod().toString();
-//		G.v().out.println("start insertting at class: "+declaredClassName+"; function: "+declaredFunction);
-    	G.v().out.println("start processing function: "+declaredFunction+";");
+//		String argsInfoString = aBody.getMethod().get
+		G.v().out.println("start insertting at class: "+declaredClassName+"; function: "+declaredFunction);
+//		G.v().out.println("argsInfoString: "+argsInfoString+";");
+    
+		G.v().out.println("start processing function: "+declaredFunction+";");
     	if(declaredClassName.contains("sgx_invoker")){
 //			G.v().out.println("Encounters the sgxinvoker class ...skip...");
 			return;
@@ -160,32 +164,56 @@ public class Transformer
     				ValueBox vBox = (ValueBox) ubIt.next();
     				Value tValue = vBox.getValue();
     				String tValueTypeStr=tValue.getType().toString();
-    				if(!(tValue instanceof Constant))
-    					condVals.add(tValue);
-//        			conditionValuesType.add(vBox.getValue().getType());
-            	    localArray.removeAll(condVals);
-	    			if(tValueTypeStr.equals("int")){
-	    				condValsInt.add(tValue);
-	    			}
-	    			else if(tValueTypeStr.equals("double")){
-	    				condValsDouble.add(tValue);
-	    			}
-	    			else if(tValueTypeStr.equals("float")){
-	    				condValsFloat.add(tValue);
-	    			}
-	    			else if(tValueTypeStr.equals("char")){
-	    				condValsChar.add(tValue);
-	    			}
-	    			else if(tValueTypeStr.equals("long")){
-	    				condValsLong.add(tValue);
-	    			}
-	    			else if(tValueTypeStr.equals("byte")){
-	    				condValsByte.add(tValue);
-	    			}
-	    			else {
-	    				condValsOtherType.add(tValue);
-	//    				condValTypeNum.add(0);
-	    			}
+    				if(!(tValue instanceof Constant)){
+    					if(!condVals.contains(tValue)){
+        					condVals.add(tValue);
+    					}
+	//        			conditionValuesType.add(vBox.getValue().getType());
+	            	    localArray.removeAll(condVals);
+		    			if(tValueTypeStr.equals("int")){
+		    				if (!condValsInt.contains(tValue)) {
+		    					condValsInt.add(tValue);
+		    	            }
+//		    				condValsInt.add(tValue);
+		    			}
+		    			else if(tValueTypeStr.equals("double")){
+		    				if (!condValsDouble.contains(tValue)) {
+		    					condValsDouble.add(tValue);
+		    	            }
+//		    				condValsDouble.add(tValue);
+		    			}
+		    			else if(tValueTypeStr.equals("float")){
+		    				if (!condValsFloat.contains(tValue)) {
+		    					condValsFloat.add(tValue);
+		    	            }
+//		    				condValsFloat.add(tValue);
+		    			}
+		    			else if(tValueTypeStr.equals("char")){
+		    				if (!condValsChar.contains(tValue)) {
+		    					condValsChar.add(tValue);
+		    	            }
+//		    				condValsChar.add(tValue);
+		    			}
+		    			else if(tValueTypeStr.equals("long")){
+		    				if (!condValsLong.contains(tValue)) {
+		    					condValsLong.add(tValue);
+		    	            }
+//		    				condValsLong.add(tValue);
+		    			}
+		    			else if(tValueTypeStr.equals("byte")){
+		    				if (!condValsByte.contains(tValue)) {
+		    					condValsByte.add(tValue);
+		    	            }
+//		    				condValsByte.add(tValue);
+		    			}
+		    			else {
+		    				if (!condValsOtherType.contains(tValue)) {
+		    					condValsOtherType.add(tValue);
+		    	            }
+//		    				condValsOtherType.add(tValue);
+		//    				condValTypeNum.add(0);
+		    			}
+    				}
     			}
 //    	    	G.v().out.println("ValuesType in condition: "+conditionValuesType.toString()+";");
     	    	//Readin stmt transformation
@@ -212,11 +240,14 @@ public class Transformer
     	//insertInitValueStmt(condValTypeNum);
 
         boolean isInitSgxInvoker = false;
-//        boolean isInitValueInSgx = false;
+        boolean isInitValueInSgx = false;
+        boolean isInitidentyLocal = false;
+        boolean isInitInvoker = false;
         lastIdentityStmt = units.getFirst();
 //        G.v().out.println("***++++++lastIdentityStmt is： "+lastIdentityStmt.toString()+";");
 
 	    G.v().out.println("localArray:"+localArray.toString());
+	    ArrayList<AssignStmt> stmtArrayList = new ArrayList<>();
     	while(scanIt2.hasNext()){
     		currProStmt=scanIt2.next();
     		ArrayList<Value> currDefVals = new ArrayList<Value>();
@@ -227,9 +258,10 @@ public class Transformer
 			while(ubIt.hasNext()){
 				ValueBox vBox = ubIt.next();
 				currDefVals.add(vBox.getValue());
-			}    	    	    	
+			}
     	    currDefVals.retainAll(condVals);
-//    	    G.v().out.println("currDefVals:"+currDefVals.toString());
+    	    
+    	    G.v().out.println("currDefVals:"+currDefVals.toString());//def number === 1???
     	    
     	    ubIt=currProStmt.getUseBoxes().iterator();
 			while(ubIt.hasNext()){
@@ -239,39 +271,71 @@ public class Transformer
     	    currUseVals.retainAll(condVals);
 //    	    G.v().out.println("currUseVals:"+currUseVals.toString()); 
     	    
-//    		G.v().out.println("current stmt is: ----------#"+currProStmt+"#----------------");
+    		G.v().out.println("current stmt is: ----------#"+currProStmt+"#----------------");
 //    		if(!currUseVals.isEmpty()){
 //    			G.v().out.println("use: "+currProStmt.getUseBoxes()+";");
 //        		G.v().out.println("current stmt type is: ----------#"+currProStmt.getClass()+"#----------------");
 //    		}
-    	    
 			if((currProStmt instanceof IdentityStmt)){
         	    G.v().out.println("currProStmt is IdentityStmt:"+currProStmt.toString());
-        		
         	    if(!currDefVals.isEmpty()){//update
-        	    	if(!isInitSgxInvoker){// && isIdentityStmtOver
-                	    initidentyLocal(localArray, units, currProStmt,identifiedLocal);//????why????
-                		insertSgxInitStmt(aBody, sgxObjLocal, units, currProStmt, "invoker.sgx_invoker");
-                		isInitSgxInvoker = true;
-                	}
+        	    	LocalGenerator localGenerator = new LocalGenerator(aBody);
+        	    	Local locali1 = localGenerator.generateLocal
+        	    			(((IdentityStmt) currProStmt).getRightOp().getType());
+        	    	IdentityStmt identityStmt = Jimple.v().newIdentityStmt
+        	    			(locali1, ((IdentityStmt) currProStmt).getRightOp());
+        	    	localArray.add(locali1);
+            		identifiedLocal.add(locali1);
+        	    	G.v().out.println("the new identityStmt is:"+identityStmt.toString());
+        	    	lastIdentityStmt = identityStmt;
+        	    	units.insertBefore(identityStmt, currProStmt);
+        	    	AssignStmt assignStmt = Jimple.v().newAssignStmt(((IdentityStmt) currProStmt)
+		.getLeftOp(), locali1);
+        	    	stmtArrayList.add(assignStmt);
         	    	//DefValue transformation
 //            	    G.v().out.println("***++++++currProStmt is:++++++++++"+currProStmt.toString());
-        	    	lastIdentityStmt = replaceValueUpdateStmt(aBody, sgxObjLocal, units, localArray, currProStmt, currDefVals);
-    	    	}
+        	    	units.remove(currProStmt);
+        	    }
         	    else{
             	    lastIdentityStmt = currProStmt;//
         	    }
         	    continue;
         	}
+			
         	//init sgx enclave
-			if(!isInitSgxInvoker && (!condVals.isEmpty())){
+			if(!isInitSgxInvoker){// && (!condVals.isEmpty())
         	    initidentyLocal(localArray, units, currProStmt,identifiedLocal);
-        		insertSgxInitStmt(aBody, sgxObjLocal, units, currProStmt, "invoker.sgx_invoker");
+        	    insertSgxInitStmt(aBody, sgxObjLocal, units, currProStmt, "invoker.sgx_invoker");
         		isInitSgxInvoker = true;
-        		
+        		if(!isInitValueInSgx && (!condVals.isEmpty())){
+        			insertValueInitStmt(aBody, sgxObjLocal, units, currProStmt);
+        			isInitValueInSgx = true;
+        		}
 //        	    lastIdentityStmt = currProStmt;//
 //        	    G.v().out.println("***++++++lastIdentityStmt is:++++++++++"+lastIdentityStmt.toString());
-        	}
+
+//        		if(declaredFunction.contains("void main(java.lang.String[])")){
+//	    			if(!isInitSgxInvoker){
+//	            		insertSgxInitStmt(aBody, sgxObjLocal, units, currProStmt, "invoker.sgx_invoker");
+//	            		isInitSgxInvoker = true;
+//	    			}
+//        		}
+    			
+    			for(AssignStmt stmt:stmtArrayList){
+        	    	G.v().out.println("the new assignment is:"+stmt.toString());
+        	    	units.insertBefore(stmt, currProStmt);
+        	    	replaceValueUpdateStmt(aBody, sgxObjLocal, units, localArray, stmt);
+    			}
+			}
+			
+//    		if(declaredFunction.contains("void main(java.lang.String[])")){
+//	            if(currProStmt.toString().contains("return"))
+//	            {
+//	            	//G.v().out.print("asjfdbashklfbhsak"+currStmt.toString());
+//	            	insertCloseEnclaveStmt(sgxObjLocal, units, currProStmt, "invoker.sgx_invoker");
+//	            }
+//	        }
+			
 //			G.v().out.println("***++++++lastIdentityStmt is:++++++++++"+lastIdentityStmt.toString());
     		if((currProStmt instanceof AssignStmt)){
     	    	G.v().out.println("currProStmt is AssignStmt: "+currProStmt.toString()+";");
@@ -280,7 +344,7 @@ public class Transformer
     	    	if(!currDefVals.isEmpty()){//update
 //            	    G.v().out.println("toBeHiddenDefValues:"+currDefVals.toString());
             	    //DefValue transformation
-            	    replaceValueUpdateStmt(aBody, sgxObjLocal, units, localArray, currProStmt, currDefVals);
+            	    replaceValueUpdateStmt(aBody, sgxObjLocal, units, localArray, currProStmt);
     	    	}
     	    	else if(!currUseVals.isEmpty()){//getLocal 
             	    replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, currProStmt, currUseVals);
@@ -292,35 +356,46 @@ public class Transformer
 //        	    G.v().out.println("conditionValues:"+condVals.toString());
         	    replaceBranchStmt(aBody, sgxObjLocal, branchResultLocal, units, localArray, currProStmt);
     		}
-
+    		
     		if(currProStmt instanceof ReturnStmt){
     	    	G.v().out.println("currProStmt is ReturnStmt: "+currProStmt.toString()+";");
-//    	    	G.v().out.println("use: "+currUseVals+";");
-    	    	
-    	    	Local tmpReturnValue = Jimple.v().newLocal("tmpReturnValue"+Long.toString(counter), currUseVals.get(0).getType());
-    			aBody.getLocals().add(tmpReturnValue);
-    			localArray.add(tmpReturnValue);
-    			G.v().out.println("tmpValue: "+tmpReturnValue.toString());    	        	
-    			DefinitionStmt newAssignStmt = initAssignStmt(tmpReturnValue);
-    			G.v().out.println("newAssignStmt is: "+newAssignStmt.toString());    	        	
-    			G.v().out.println("lastIdentityStmt is: "+lastIdentityStmt.toString());
-//    	        units.addFirst(newAssignStmt);
-    			units.insertAfter(newAssignStmt, lastIdentityStmt);
-    			
-    			G.v().out.println("add newAssignStmt is: ++++++++++++++++++++++++++ "+newAssignStmt+"++++++++++++++++++++++");
-    			
-    			newAssignStmt = Jimple.v().newAssignStmt(tmpReturnValue,currUseVals.get(0));
-    			G.v().out.println("newAssignStmt is: ++++++++++++++++++++++++++ "+newAssignStmt+"++++++++++++++++++++++");
-    			units.insertBefore(newAssignStmt, currProStmt);
-//    	        units.addFirst(newAssignStmt);
-    			//
-//    	    	rightOp = newAssignStmt.getRightOp();
-//    	    	leftOpValue = newAssignStmt.getLeftOp();
-    			replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, newAssignStmt, currUseVals);
-    			G.v().out.println("ReturnStmt to be replaced is: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
-    			((ReturnStmt)currProStmt).setOp(tmpReturnValue);
-    			G.v().out.println("new ReturnStmt is: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
-    		}
+    	    	if(!currUseVals.isEmpty()){
+	    	    	G.v().out.println("use: "+currUseVals+";");
+	    	    	
+	    	    	Local tmpReturnValue = Jimple.v().newLocal("tmpReturnValue"+Long.toString(counter), currUseVals.get(0).getType());
+	    			aBody.getLocals().add(tmpReturnValue);
+	    			localArray.add(tmpReturnValue);
+	    			G.v().out.println("tmpValue: "+tmpReturnValue.toString());    	        	
+	    			DefinitionStmt newAssignStmt = initAssignStmt(tmpReturnValue);
+	    			G.v().out.println("newAssignStmt is: "+newAssignStmt.toString());    	        	
+	    			G.v().out.println("lastIdentityStmt is: "+lastIdentityStmt.toString());
+	//    	        units.addFirst(newAssignStmt);
+	    			units.insertAfter(newAssignStmt, lastIdentityStmt);
+	    			
+	    			G.v().out.println("add newAssignStmt is: ++++++++++++++++++++++++++ "+newAssignStmt+"++++++++++++++++++++++");
+	    			
+	    			newAssignStmt = Jimple.v().newAssignStmt(tmpReturnValue,currUseVals.get(0));
+	    			G.v().out.println("newAssignStmt is: ++++++++++++++++++++++++++ "+newAssignStmt+"++++++++++++++++++++++");
+	    			units.insertBefore(newAssignStmt, currProStmt);
+	//    	        units.addFirst(newAssignStmt);
+	    			//
+	//    	    	rightOp = newAssignStmt.getRightOp();
+	//    	    	leftOpValue = newAssignStmt.getLeftOp();
+	    			replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, newAssignStmt, currUseVals);
+	    			G.v().out.println("ReturnStmt to be replaced is: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
+	    			((ReturnStmt)currProStmt).setOp(tmpReturnValue);
+	    			G.v().out.println("new ReturnStmt is: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
+    	    	}
+    	    }
+    		
+			if(currProStmt.toString().contains("return")){
+	            	//G.v().out.print("asjfdbashklfbhsak"+currStmt.toString());
+	            	insertDeletValueStmt(aBody, sgxObjLocal, units, currProStmt);
+	        		if(declaredFunction.contains("void main(java.lang.String[])")){
+	    	            	//G.v().out.print("asjfdbashklfbhsak"+currStmt.toString());
+	    	            insertCloseEnclaveStmt(sgxObjLocal, units, currProStmt, "invoker.sgx_invoker");
+	    	        }
+			}
     		if(currProStmt instanceof InvokeStmt){
     	    	G.v().out.println("currProStmt is InvokeStmt: "+currProStmt.toString()+";");
 //    	    	G.v().out.println("use: "+currProStmt.getUseBoxes()+";");
@@ -342,6 +417,7 @@ public class Transformer
         			
         	        
         			newAssignStmt = Jimple.v().newAssignStmt(tmpInvoke,invokeParaValue);
+        			G.v().out.println("newAssignStmt is: +++++++ "+newAssignStmt+"++++++++++++++++++++++");        			
         			units.insertBefore(newAssignStmt, currProStmt);
 //        	    	rightOp = newAssignStmt.getRightOp();
 //        	    	leftOpValue = newAssignStmt.getLeftOp();
@@ -625,7 +701,7 @@ public class Transformer
 		}else{
 			indexwriter("-1");
 		}
-		indexwriter(return_index);
+		indexwriter("-1");
 		
 		if(left_index == "-1")
 			G.v().out.println("stmt has no first operand:********"+left_index+"*************");
@@ -654,12 +730,11 @@ public class Transformer
 			G.v().out.println("lastIdentityStmt is: "+lastIdentityStmt.toString());
 //	        units.addFirst(assignStmt);
 			units.insertAfter(assignStmt, lastIdentityStmt);
-	        
-//			localArray.add(tmpRef);
 			
 			assignStmt = Jimple.v().newAssignStmt(tmpRef,
 					Jimple.v().newVirtualInvokeExpr
 				          (sgxObjLocal, toCall.makeRef(), Arrays.asList()));
+			units.insertBefore(assignStmt, currProStmt);
 			((AssignStmt)currProStmt).setRightOp(tmpRef);
 		}
 		else{
@@ -816,7 +891,7 @@ public class Transformer
 		}else{
 			indexwriter("-1");
 		}
-		indexwriter(return_index);
+		indexwriter("-1");
 		
 		if(left_index == "-1")
 			G.v().out.println("stmt has no first operand:********"+left_index+"*************");
@@ -842,8 +917,7 @@ public class Transformer
 			Local sgxObjLocal,
 			PatchingChain<Unit> units,
 			List<Local> localArray,
-			Unit currProStmt,
-			ArrayList<Value> currDefVals) {
+			Unit currProStmt) {
 		// TODO Auto-generated method stub
     	Value rightOp = null;
     	Value leftOpValue = null;
@@ -859,7 +933,7 @@ public class Transformer
 
             G.v().out.println(" currProStmt Type: "+currProStmt.getClass()+";");
         }
-//    	G.v().out.println(" curr pro Unit: "+rightOp+";");
+    	G.v().out.println(" curr pro Unit: "+rightOp+";");
     	
 		ArrayList<Value> variable = new ArrayList<Value>();//
 		ArrayList<Value> cons = new ArrayList<Value>();//
@@ -868,11 +942,18 @@ public class Transformer
 		boolean RightOpIsInvoke = false;
 		boolean isRightOpInCondVal = false;
     	analyzeExp(rightOp, values, operator, cons, variable);//
+    	
     	for(Value val:values){
     		if((val instanceof JLengthExpr)||(val instanceof InstanceInvokeExpr)||(val instanceof ArrayRef))
     			RightOpIsInvoke = true;
     		if(condVals.contains(val))
     			isRightOpInCondVal=true;
+//    		if(val instanceof ParameterRef){
+//				G.v().out.println("the ParameterRef is: "+val);
+//				localArray.add(val);
+//				((ParameterRef)val).
+//    		}
+    			
     	}
     	//to process stmt like x=invoke(temp1) or x=invoke(y)
 		if(RightOpIsInvoke){
@@ -990,8 +1071,14 @@ public class Transformer
 					}
 				}
 				if(!setParam0){
-					left_index = ((Value)(values.get(0))).getType().toString()+"_"+values.get(0);
-					setParam0 = true;
+					if(values.get(0) instanceof ParameterRef){
+						G.v().out.println("the only @paraRef Value is: "+values.get(0));
+						//new local = @paraRef1
+					}
+					else if(values.get(0) instanceof Constant){
+						left_index = ((Value)(values.get(0))).getType().toString()+"_"+values.get(0);
+						setParam0 = true;
+					}
 				}
 			}
 		}else if(values.size()==2){
@@ -1088,10 +1175,12 @@ public class Transformer
 				}
 			}
 			if(!setParam0){
+				G.v().out.println("left @paraRef Value is: "+values.get(0));
 				left_index = ((Value)(values.get(0))).getType().toString()+"_"+values.get(0);
 				setParam0=true;
 			}
 			if(!setParam1){
+				G.v().out.println("right @paraRef Value is: "+values.get(1));
 				right_index = ((Value)(values.get(1))).getType().toString()+"_"+values.get(1);
 				setParam1=true;
 			}
@@ -1268,54 +1357,79 @@ public class Transformer
 			return condValsOtherType;
 	}
     
-//	@SuppressWarnings("unused")
-//	private void insertValueInitStmt(
-//			Body aBody,
-//			Local sgxObjLocal,
-//			PatchingChain<Unit> units, 
-//			Unit currStmt, 
-//			ArrayList<Value> condValsTypeArray){		
-///*		SootMethod toCallMethod = Scene.v().getMethod("<Invoker.sgx_invoker: Void clear()>");
-//		Stmt newInvokeStmt = Jimple.v().newInvokeStmt(
-//				Jimple.v().newVirtualInvokeExpr(sgxObjLocal, toCallMethod.makeRef(), Arrays.asList()));
-//		units.insertBefore(newInvokeStmt, currStmt);
-//		
-//		toCallMethod = Scene.v().getMethod
-//			      ("<invoker.sgx_invoker: void setCounter(long)>");
-//		newInvokeStmt = Jimple.v().newInvokeStmt(
-//				Jimple.v().newVirtualInvokeExpr(sgxObjLocal, toCallMethod.makeRef(), Arrays.asList(LongConstant.v(counter))));
-//		units.insertBefore(newInvokeStmt, currStmt);*/
-//		
-//		SootMethod toCallMethod = Scene.v().getMethod("<invoker.sgx_invoker: boolean initValueInEnclave(int[])>");//(int[] intArray, int length)
-////		Local valueOfType = Jimple.v().newLocal("valueOfType", ArrayType.v(RefType.v("java.lang.Integer"), 1));
-//		
-////		Local arg = Jimple.v().newLocal("valueType", ArrayType.v(RefType.v("java.lang.Integer"), 1));
-////		aBody.getLocals().add(arg);
-////		G.v().out.println("arg is: ----------#"+arg.getType()+"#----------------");
-//		
-////		Stmt newAssignStmt = Jimple.v().newAssignStmt(arg, tArrayList);
-//				
-//				//Jimple.v().newArrayRef(valueOfType, 0);
-//				//Jimple.v().newArrayRef(base, index)
-//				//newParameterRef(ArrayType.v(RefType.v("java.lang.Integer"), 1), 0));
-//			      //Jimple.v().newParameterRef(ArrayType.v(RefType.v("java.lang.String"), 1), 0));
-////		G.v().out.println("newIdentityStmt is: ----------#"+newAssignStmt+"#----------------");
-////		units.insertBefore(newAssignStmt, currStmt);	
-//		
-//		InvokeStmt newInvokeStmt = Jimple.v().newInvokeStmt(
-//				Jimple.v().newVirtualInvokeExpr(sgxObjLocal, toCallMethod.makeRef(), condValsTypeArray));
-//		G.v().out.println("newInvokeStmt is: ----------#"+newInvokeStmt+"#----------------");
-//		units.insertBefore(newInvokeStmt, currStmt);	
-//	}
+	private void insertDeletValueStmt(
+			Body aBody,
+			Local sgxObjLocal,
+			PatchingChain<Unit> units, 
+			Unit currStmt){	
+
+        SootMethod toCall = Scene.v().getMethod
+				("<invoker.sgx_invoker: boolean deleteValueInEnclave()>");
+
+		VirtualInvokeExpr initValueExpr = Jimple.v().newVirtualInvokeExpr
+				(sgxObjLocal, toCall.makeRef(), 
+						Arrays.asList());
+		Stmt newInitInvokeStmt = Jimple.v().newInvokeStmt(initValueExpr);
+		G.v().out.println("ValueDeleteStmt is:#"+newInitInvokeStmt+"#--");
+		units.insertBefore(newInitInvokeStmt, currStmt);
+	}
 	
+	@SuppressWarnings("unused")
+	private void insertValueInitStmt(
+			Body aBody,
+			Local sgxObjLocal,
+			PatchingChain<Unit> units, 
+			Unit currStmt){		
+
+        LocalGenerator localGenerator = new LocalGenerator(aBody);
+        Local local1 = localGenerator.generateLocal(soot.ArrayType.v(IntType.v(), 1));
+        NewArrayExpr newArrayExpr = Jimple.v().newNewArrayExpr(IntType.v(), IntConstant.v(condValsTypeArray.size()));
+        AssignStmt assignStmt2 = Jimple.v().newAssignStmt(local1, newArrayExpr);    		
+        units.insertBefore(assignStmt2, currStmt);
+        
+        int i=0;
+        for(Value num:condValsTypeArray){
+            ArrayRef arrayRef = Jimple.v().newArrayRef(local1, IntConstant.v(i++));
+            AssignStmt assignStmt = Jimple.v().newAssignStmt(arrayRef, num);
+    		units.insertBefore(assignStmt, currStmt);
+        }
+        
+        SootMethod toCall = Scene.v().getMethod
+				("<invoker.sgx_invoker: boolean initValueInEnclave(int[])>");
+
+		VirtualInvokeExpr initValueExpr = Jimple.v().newVirtualInvokeExpr
+				(sgxObjLocal, toCall.makeRef(), 
+						Arrays.asList(local1));
+		Stmt newInitInvokeStmt = Jimple.v().newInvokeStmt(initValueExpr);
+		G.v().out.println("ValueInitStmt is:#"+newInitInvokeStmt+"#--");
+		units.insertBefore(newInitInvokeStmt, currStmt);
+	}
+
 	@SuppressWarnings("unused")
 	private void insertSgxInitStmt(
 			Body aBody,
 			Local sgxObjLocal, //sgxObjLocal
 			PatchingChain<Unit> units,
 			Unit currStmt, //first stmt
-			String className) //Object NewArrayExpr) {
-			{
+			String className) { //Object NewArrayExpr)
+//		String funcNameString = aBody.getMethod().toString();
+//		G.v().out.println("funcNameString: "+funcNameString+";");
+//		int argsString = aBody.getMethod().equivHashCode();
+//		G.v().out.println("argsString: "+argsString+";");
+//		G.v().out.println("getNumberedSubSignature: "+aBody.getMethod().getNumberedSubSignature()+";");
+//		G.v().out.println("getTags: "+aBody.getTags());
+//		G.v().out.println("hashCode: "+aBody.hashCode());
+//		G.v().out.println("getParameterCount: "+aBody.getMethod().getParameterCount());
+//		StringBuilder methodID = new StringBuilder();
+//		methodID.append(funcNameString);
+//		for(int i=0; i<aBody.getMethod().getParameterCount(); i++){
+//			G.v().out.println("ParameterLocal-"+i+": "+aBody.getParameterLocal(i).toString());
+//			methodID.append("_");
+//			methodID.append(aBody.getParameterLocal(i));
+//		}
+//		G.v().out.println("methodID: "+methodID);
+		
+
         ///"sgxInvoker = new invoker.sgx_invoker;"
 		soot.jimple.NewExpr sootNew = soot.jimple.Jimple.v().newNewExpr(RefType.v(className));
 	    soot.jimple.AssignStmt stmt = soot.jimple.Jimple.v().newAssignStmt(sgxObjLocal, sootNew);
@@ -1333,31 +1447,8 @@ public class Transformer
 			      ("<invoker.sgx_invoker: boolean initenclave()>");
 		Stmt newInvokeStmt = Jimple.v().newInvokeStmt(
 				Jimple.v().newVirtualInvokeExpr
-		           (sgxObjLocal, toCall.makeRef(), Arrays.asList()));
+		           (sgxObjLocal, toCall.makeRef(), Arrays.asList()));//IntConstant.v(1)
 		units.insertBefore(newInvokeStmt, currStmt);
-
-        LocalGenerator localGenerator = new LocalGenerator(aBody);
-        Local local1 = localGenerator.generateLocal(soot.ArrayType.v(IntType.v(), 1));
-        NewArrayExpr newArrayExpr = Jimple.v().newNewArrayExpr(IntType.v(), IntConstant.v(condValsTypeArray.size()));
-        AssignStmt assignStmt2 = Jimple.v().newAssignStmt(local1, newArrayExpr);    		
-        units.insertBefore(assignStmt2, currStmt);
-
-        int i=0;
-        for(Value num:condValsTypeArray){
-            ArrayRef arrayRef = Jimple.v().newArrayRef(local1, IntConstant.v(i++));
-            AssignStmt assignStmt = Jimple.v().newAssignStmt(arrayRef, num);
-    		units.insertBefore(assignStmt, currStmt);
-        }
-        
-		toCall = Scene.v().getMethod
-				("<invoker.sgx_invoker: boolean initValueInEnclave(int[])>");
-
-		VirtualInvokeExpr initValueExpr = Jimple.v().newVirtualInvokeExpr
-				(sgxObjLocal, toCall.makeRef(), 
-						Arrays.asList(local1));
-		Stmt newInitInvokeStmt = Jimple.v().newInvokeStmt(initValueExpr);
-//		G.v().out.println("newInvokeStmt is: ----------#"+newInitInvokeStmt+"#----------------");
-		units.insertBefore(newInitInvokeStmt, currStmt);
 	}
 
 	private AssignStmt initAssignStmt(Local l){
@@ -1392,7 +1483,8 @@ public class Transformer
 		}
 		return stmt;
 	}
-	private void initidentyLocal(
+	
+private void initidentyLocal(
 			List<Local> localList,
 			PatchingChain<Unit> units, 
 			Unit currStmt, 
@@ -1409,6 +1501,21 @@ public class Transformer
 			G.v().out.println(l.toString()+": init stmt will be inserted into jimplefile!");
 			units.insertBefore(stmt, currStmt);
 		}
+	}
+	
+	@SuppressWarnings("unused")
+	private void insertCloseEnclaveStmt(
+			Local sgxObjLocal, //sgxObjLocal
+			PatchingChain<Unit> units,
+			Unit currStmt, //first stmt
+			String className) {
+
+		SootMethod toCall = Scene.v().getMethod
+			      ("<invoker.sgx_invoker: boolean closeenclave()>");
+		Stmt newInvokeStmt = Jimple.v().newInvokeStmt(
+				Jimple.v().newVirtualInvokeExpr
+		           (sgxObjLocal, toCall.makeRef(), Arrays.asList()));
+		units.insertBefore(newInvokeStmt, currStmt);
 	}
 }
 

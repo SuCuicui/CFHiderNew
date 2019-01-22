@@ -71,6 +71,7 @@ sgx_status_t encall_table_load(sgx_enclave_id_t eid, int* retval);
 sgx_status_t encall_hash_readin(sgx_enclave_id_t eid, int* retval, char* buf, long int line);
 sgx_status_t encall_read_line(sgx_enclave_id_t eid, int* retval, char* in_buf, int buf_len, long int line);
 sgx_status_t encall_varible(sgx_enclave_id_t eid, int* v_array, int size);
+sgx_status_t encall_deleteValue(sgx_enclave_id_t eid, int* retval);
 
 #ifdef __cplusplus
 }

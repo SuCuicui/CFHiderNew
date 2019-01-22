@@ -19,7 +19,7 @@ int encall_table_load();
 int encall_hash_readin(char* buf,long line);
 int encall_read_line(char* in_buf,int buf_len,long line);
 void encall_varible(int* v_array,int size);
-
+int encall_deleteValue();
 int encall_switch_type_i(long Line, int* int_array, int lenint,
 			double* double_array, int lendouble,
 			float* float_array, int lenfloat,

@@ -161,6 +161,10 @@ typedef struct ms_encall_varible_t {
 	int ms_size;
 } ms_encall_varible_t;
 
+typedef struct ms_encall_deleteValue_t {
+	int ms_retval;
+} ms_encall_deleteValue_t;
+
 typedef struct ms_ocall_print_string_t {
 	char* ms_str;
 } ms_ocall_print_string_t;
@@ -956,6 +960,15 @@ sgx_status_t encall_varible(sgx_enclave_id_t eid, int* v_array, int size)
 	ms.ms_v_array = v_array;
 	ms.ms_size = size;
 	status = sgx_ecall(eid, 15, &ocall_table_Enclave, &ms);
+	return status;
+}
+
+sgx_status_t encall_deleteValue(sgx_enclave_id_t eid, int* retval)
+{
+	sgx_status_t status;
+	ms_encall_deleteValue_t ms;
+	status = sgx_ecall(eid, 16, &ocall_table_Enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
 

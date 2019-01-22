@@ -61,6 +61,7 @@ enclave {
 		public int encall_read_line([in,size=50]char* in_buf,int buf_len,long line);
 		
 		public void encall_varible([user_check]int* v_array,int size);
+		public int encall_deleteValue(void);
 	};
 
 };

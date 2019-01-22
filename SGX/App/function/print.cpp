@@ -148,13 +148,13 @@ void ocall_file_read(char* file,int* buf,long* start)
 
 void ocall_print_string(const char *str)
 {
-    printf("==in ocall_print:%s", str);
+    printf("%s", str);
 }
 void ocall_print_int(int str)
 {
-    printf("-in ocall_int:%d\n", str);
+    printf("%d\n", str);
 }
 void ocall_print_long(long str)
 {
-    printf("-in ocall_long:%ld\n", str);
+    printf("%ld\n", str);
 }

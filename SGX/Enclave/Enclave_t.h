@@ -33,6 +33,7 @@ int encall_table_load();
 int encall_hash_readin(char* buf, long int line);
 int encall_read_line(char* in_buf, int buf_len, long int line);
 void encall_varible(int* v_array, int size);
+int encall_deleteValue();
 
 sgx_status_t SGX_CDECL ocall_print_string(const char* str);
 sgx_status_t SGX_CDECL ocall_print_int(int str);
