@@ -25,5 +25,5 @@
 hs_err_pid*
 
 # filepath
-/bin/
 /sootOutput/
+/attributes/
