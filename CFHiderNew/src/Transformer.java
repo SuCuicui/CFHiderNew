@@ -464,8 +464,10 @@ public class Transformer
     	
 		boolean rightOpIsInvoke = false;
     	for(Value val:values){
-    		if((val instanceof InvokeExpr)||(val instanceof ArrayRef))//ref????
+        	G.v().out.println("the invokestmt val is: "+val+";");
+    		if((val instanceof InvokeExpr)||(val instanceof ArrayRef)){//||(val instanceof ArrayRef)
     			rightOpIsInvoke = true;
+    		}
     	}
     	if(rightOpIsInvoke){
         	G.v().out.println("the invokestmt rightop is: "+rightOp+";");
