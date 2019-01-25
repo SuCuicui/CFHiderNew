@@ -1,8 +1,6 @@
 package invoker;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class sgx_invoker{
 	//public native int varargsMethod( int... no,float... fl,double... dl,long... lo );
@@ -32,20 +30,6 @@ public class sgx_invoker{
 			e.printStackTrace();
 		}
 	}  
-
-	//maximum cache size is determined by the MAX(cacheSize, expire). 
-	//if no hash has expired, then the cache size can be exceeded by inserting more hash into CFCache.
-	// HOwever, since each incoming call will increment the clock, the total number of entries in the CFCache 
-	// will not exceed the expire. 
-   static final int cacheSize = 100;
-   static HashMap<Integer, String> CFCache = new HashMap<Integer, String>();
-   static HashMap<Integer, Long> cacheClock = new HashMap<Integer, Long>();
-   static HashMap<Integer, Long> cacheClockHour = new HashMap<Integer, Long>();
-
-   static long clock = 0;
-   static long clockHour = 0;
-   static final long  expire = 1000;
-   //static final long clockSize = 10000;
 
     //TODO: may potentially reduce the performance, can be improved later
 	//ArrayList<Object> objects = null;
@@ -80,68 +64,6 @@ public class sgx_invoker{
 	static long request = 1;
 	static long hitNum = 0;
 	
-	private String check_cache(int c_hash){
-		if(clock%10000000==0){
-			System.out.println("############################ Cache Hit ##########################\n");
-			System.out.println(sgx_invoker.getHitRatio());		
-		}
-		request++;
-		if(clock == Long.MAX_VALUE){
-			clock=0;
-			clockHour++;
-			request = 1;
-			hitNum = 0;
-		}else{
-			clock++;
-		}
-		Integer hash = new Integer(c_hash);
-		if(CFCache.containsKey(hash)){
-			hitNum++;
-			cacheClock.put(hash, new Long(clock));
-			return CFCache.get(hash);
-		}else{
-//			return "-1";
-			return null;
-		}
-	}
-	
-	public static String getHitRatio(){
-		return hitNum+"||"+request;
-	}
-	
-	private void updateCache(int c_hash, String ret) {
-		Integer hash = new Integer(c_hash);
-
-		if(CFCache.size()<cacheSize){
-			CFCache.put(hash, ret);
-			cacheClock.put(hash , new Long(clock));
-			cacheClockHour.put(hash, new Long(clockHour));
-		}else{
-			CFCache.put(hash, ret);
-			cacheClock.put(hash , new Long(clock));
-			cacheClockHour.put(hash, new Long(clockHour));					
-			}
-		}
-		
-	private Integer getExpireCache() {
-		for(Integer i: CFCache.keySet()){
-			if(computeExpire(cacheClock.get(i), cacheClockHour.get(i),expire)){
-				return i;
-			}
-		}
-		return null;
-	}
-	
-	private boolean computeExpire(Long hashClock, Long hashHour, long expire) {
-		if((clockHour==hashHour)&&(clock-hashClock.longValue()<expire))
-			return false;
-		else if((clockHour-hashHour)==1 && (Long.MAX_VALUE-(hashClock.longValue()-clock)<expire))
-			return false;
-		else return true;
-	}
-	
-
-
 	public void clear(){
 		intTail = 0;
 		doubleTail = 0;
@@ -216,25 +138,12 @@ public class sgx_invoker{
 		}
 		else
 			return false;
-//		return true;
 	}
 	
 	
 	public void updateValueInEnclave(){
-		// int c_hash=getArrayHash();
-		// String hitResultString=check_cache(c_hash);
-		
 		int ret = -1;
-//		if(hitResultString == null){
-//			System.out.println("cache not hit! Start to compute in Enclave to updateValueInEnclave!");
-			// System.out.println(counter);
-			ret = commitUpdate(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-//			updateCache(c_hash, Integer.toString(ret));
-//		}
-//		else {
-//			System.out.println("hit");
-//			ret = Integer.valueOf(hitResultString);			
-//		}
+		ret = commitUpdate(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
 		
 		if(ret == 1){
 //			 System.out.println("updateValueInEnclave is okay!");
@@ -252,45 +161,10 @@ public class sgx_invoker{
 		}
 		
 	}
-
-	public int getArrayHash(){
-		String cache=""+counter;
-		for(int loop=0;loop<intTail;loop++){
-			cache = cache + intArray[loop];
-		}
-		for(int loop=0;loop<doubleTail;loop++){
-			cache = cache + doubleArray[loop];
-		}
-		for(int loop=0;loop<floatTail;loop++){
-			cache = cache + floatArray[loop];
-		}
-		for(int loop=0;loop<longTail;loop++){
-			cache = cache + longArray[loop];
-		}
-		for(int loop=0;loop<charTail;loop++){
-			cache = cache + charArray[loop];
-		}
-		for(int loop=0;loop<byteTail;loop++){
-			cache = cache + byteArray[loop];
-		}
-		return cache.hashCode();
-	}
-	
 	public boolean getBooleanValue(){ 
-//		int c_hash=getArrayHash();
-//		String hitResultString=check_cache(c_hash);
 		
 		int ret = -1;
-//		if(hitResultString == null){
-//			System.out.println("cache not hit! Start to compute in Enclave to getBooleanValue!");
-//			System.out.println(counter);
-			ret = commitBranch(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-//			updateCache(c_hash, Integer.toString(ret));
-//		}
-//		else {
-//			System.out.println("hit");
-//			ret = Integer.valueOf(hitResultString);			
-//		}
+		ret = commitBranch(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
 		
 		if(ret == 1){
 //			System.out.println("getBooleanValue is okay!");
@@ -299,7 +173,6 @@ public class sgx_invoker{
 		else if(ret == 0)
 			return false;
 		else{
-			
 			//throw new Exception("error");
 			System.out.println("ret:"+ret);
 			System.out.println("error");
@@ -310,90 +183,40 @@ public class sgx_invoker{
 	}
 	
 	public int getIntValue(){ 
-//		int c_hash=getArrayHash();
-//		String hit=check_cache(c_hash);
-		
 		int ret = -1;
-//		if(hit==null){
-//			System.out.println("cache not hit! Start to compute in Enclave to getIntValue!");
-//			System.out.println(counter);
-			 ret = commitInt(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-//			updateCache(c_hash, String.valueOf(ret));
-//		}
-//		else {
-//			System.out.println("hit");
-//			ret = Integer.valueOf(hit);			
-//		}
+		ret = commitInt(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
+
 //		if(ret !=-1)
 //			  System.out.println("getIntValue is okay!");
 		return ret;
 	}
 
 	public float getFloatValue(){ 
-		int c_hash=getArrayHash();
-		String hit=check_cache(c_hash);
 		float ret = -1;
-		if(hit==null){
-			 ret = commitFloat(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-			updateCache(c_hash, String.valueOf(ret));
-		}
-		else {
-//			System.out.println("hit");
-			ret = Float.valueOf(hit);			
-		}
+		ret = commitFloat(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
 		
-//		System.out.println("ret:"+ret);
-//		System.out.println("error");
-//		System.out.println("ret");
 		return ret;
 	
 	}
 
 	public double getDoubleValue(){ 
-		int c_hash=getArrayHash();
-		String hit=check_cache(c_hash);
 		
 		double ret = -1;
-		if(hit==null){
-			 ret = commitDouble(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-			updateCache(c_hash, String.valueOf(ret));
-		}
-		else {
-//			System.out.println("hit");
-			ret = Double.valueOf(hit);			
-		}
+		ret = commitDouble(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
+			
 		return ret;
 	}
 
 	public char getCharValue(){ 
-		int c_hash=getArrayHash();
-		String hit=check_cache(c_hash);
-		
 		char ret;
-		if(hit==null){
-			 ret = commitChar(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-			updateCache(c_hash, String.valueOf(ret));
-		}
-		else {
-//			System.out.println("hit");
-			ret = hit.charAt(0);			
-		}
+		ret = commitChar(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
 		return ret;
 	}
 
 	public byte getByteValue() throws UnsupportedEncodingException{ 
-		int c_hash=getArrayHash();
-		String hit=check_cache(c_hash);
-		
 		byte ret;
-		if(hit==null){
-			 ret = commitByte(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
-			 updateCache(c_hash, String.valueOf(ret));
-		}
-		else {
-//			System.out.println("hit");
-			ret = hit.getBytes(hit)[0];
-		}
+		ret = commitByte(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
+		
 		return ret;
 	}
 }

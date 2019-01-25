@@ -28,7 +28,7 @@ public class Sort_Quick {
 //        printArr(numbers);
 //        
         quick(numbers);
-        System.out.print("快速排序后：");
+        System.out.println("快速排序后：");
         printArr(numbers);
     }
 	 

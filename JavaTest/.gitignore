@@ -1,5 +1,5 @@
-/sootOutput
-/bin
-/originJimple
-replaceOutput
+/sootOutput/
+/bin/
+/originJimple/
+/replaceOutput/
 /*.log

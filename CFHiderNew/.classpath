@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/home/xidian/bitbucket/cfhider-v2/BranchTransformer/lib/soot-trunk.jar"/>
+	<classpathentry kind="lib" path="/home/xidian/CFHiderNew/soot-lib/soot-trunk.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

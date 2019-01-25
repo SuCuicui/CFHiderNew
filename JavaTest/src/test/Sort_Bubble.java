@@ -5,7 +5,7 @@ public class Sort_Bubble {
 	public static void main(String[] args) 
     {
     
-//		System.out.println("main(): ");
+		System.out.println("main(): ");
         
         int[] numbers=new int[10];
         numbers[0]=10;
@@ -35,7 +35,7 @@ public class Sort_Bubble {
 	
 	 public static void bubbleSort(int[] numbers)
 	    {
-//		    System.out.println("bubbleSort(): ");
+		    System.out.println("bubbleSort(): ");
 	        int temp = 0;
 	        int size = numbers.length;
 	        for(int i = 0 ; i < size-1; i ++)
