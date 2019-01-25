@@ -270,7 +270,7 @@ void print_array(){
 	for(int i=0;i<5;i++){
 		printf("v_int[%d]=%d",i,get_stacktop(&S)->v_int[i]);
 	}
-	printf("\n");
+	printf(" top = %d\n", (&S)->top);
 }
 
 int read_table(char* file)
