@@ -1,0 +1,28 @@
+javac -classpath /home/ck/hadoop/hadoop-core-1.0.4.jar:/home/ck/hadoop/lib/commons-cli-1.2.jar:/home/ck/hadoopSort/commons-logging-1.2/commons-logging-1.2.jar -d ./bin ./src/*.java
+
+javac -classpath /home/ck/hadoop/hadoop-core-1.0.4.jar:/home/ck/hadoop/lib/commons-cli-1.2.jar -d ./hbin ./hsrc/*.java
+bin/hadoop jar hadoop-examples-1.0.4.jar terasort sortinput sortout01
+
+
+
+time bin/hadoop jar /home/ck/hadoopSort/bin/TestFakeSegmentForJniHadoop.jar sortinput sortout04
+
+time bin/hadoop jar /home/ck/hadoopSort/TransFakeSegmentForJni/TestFakeSegmentForJniHadoop.jar -files /home/ck/hadoopJNItest/TestJni/libSGX.so,/home/ck/hadoopJNItest/TestJni/enclave.signed.so,/home/ck/hadoopJNItest/TestJni/enclave.so,/tmp/SGXindex  sortinput sortoutput03
+
+time bin/hadoop jar /home/ck/hadoopSort/FullTransFakeSegmentForJni/TestFakeSegmentForJniHadoop.jar -files /home/ck/hadoopJNItest/TestJni/libSGX.so,/home/ck/hadoopJNItest/TestJni/enclave.signed.so,/home/ck/hadoopJNItest/TestJni/enclave.so,/tmp/SGXindex  sortinput sortoutput05
+
+
+
+
+
+
+
+_________________________
+data size: 1G
+
+origin:  2m12.816s
+
+replece: 2m59.594s
+
+fullfake: 28m33.382s
+_________________________

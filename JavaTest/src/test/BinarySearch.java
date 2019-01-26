@@ -8,11 +8,11 @@ package test;
 public class BinarySearch { 
 	public static void main(String[] args) {
 //		System.out.println("main(): ");
-		int[] src=new int[1000000];//1000000
-		for(int i=0;i<1000000;i++){//1000000
+		int[] src=new int[100];//1000000
+		for(int i=0;i<100;i++){//1000000
 			src[i] = i;
         }
-        System.out.println(binarySearch(src, 490000));//490000
+        System.out.println(binarySearch(src, 49));//490000
         //System.out.println(binarySearch(src,3,0,src.length-1));
     }
 

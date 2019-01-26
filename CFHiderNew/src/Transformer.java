@@ -264,10 +264,10 @@ public class Transformer
 				if(!currDefVals.contains(tmpValue))
 					currDefVals.add(tmpValue);
 			}
-    	    G.v().out.println("currDefVals:"+currDefVals.toString());//def number === 1???
+//    	    G.v().out.println("currDefVals:"+currDefVals.toString());//def number === 1???
     	    currDefVals.retainAll(condVals);
     	    
-//    	    G.v().out.println("currDefVals:"+currDefVals.toString());//def number === 1???
+    	    G.v().out.println("currDefVals:"+currDefVals.toString());//def number === 1???
     	    
     	    ubIt=currProStmt.getUseBoxes().iterator();
 			while(ubIt.hasNext()){
@@ -276,9 +276,9 @@ public class Transformer
 				if(!currUseVals.contains(tmpValue))
 					currUseVals.add(tmpValue);
 			}    	    	   	
-    	    G.v().out.println("currUseVals:"+currUseVals.toString()); 
-    	    currUseVals.retainAll(condVals);
 //    	    G.v().out.println("currUseVals:"+currUseVals.toString()); 
+    	    currUseVals.retainAll(condVals);
+    	    G.v().out.println("currUseVals:"+currUseVals.toString()); 
     	    
     		G.v().out.println("current stmt is: ----------#"+currProStmt+"#----------------");
 //    		if(!currUseVals.isEmpty()){
@@ -416,7 +416,7 @@ public class Transformer
     	    	for(Value invokeParaValue:currUseVals){
     	    		ArrayList<Value> oneValues = new ArrayList<>();
     	    		oneValues.add(invokeParaValue);
-    	    		Local tmpInvoke = Jimple.v().newLocal("tmpInvoke"+Long.toString(counter), currUseVals.get(0).getType());
+    	    		Local tmpInvoke = Jimple.v().newLocal("tmpNonAssignInvokeValue"+Long.toString(counter), currUseVals.get(0).getType());
         			aBody.getLocals().add(tmpInvoke);
         			localArray.add(tmpInvoke);    			
         			G.v().out.println("tmpValue: "+tmpInvoke.toString());    	        	
@@ -472,128 +472,254 @@ public class Transformer
 		ArrayList<Value> cons = new ArrayList<Value>();//
 		ArrayList<Value> values = new ArrayList<Value>();
 		ArrayList<String> operator = new ArrayList<String>();
-		
+		//analyze rightop to contruct values
+    	analyzeExp(rightOp, values, operator, cons, variable);//
+    	
+//    	for(Value local: values){
+//			G.v().out.println("values:********"+local+"*************");
+//		}			
+//		for(Value local: variable){
+//			G.v().out.println("variable:********"+local+"*************");//parameter non-constant
+//		}
+//		for(Value local: cons){
+//			G.v().out.println("cons:********"+local+"*************");//constant
+//		}
+
+		boolean LeftOpHasArrayRef=false;
+		boolean RightOpIsInvokeOrHasArrRef = false;
+		boolean RightOpIsInvoke = false;
+		boolean rightOpHasArrRef = false;
+    	ArrayList<Value> rightCondValue = new ArrayList<Value>();
+    	for(Value val:values){			
+    		G.v().out.println("val:********"+val+"*************");
+    		if((val instanceof JLengthExpr)||(val instanceof InstanceInvokeExpr)){
+    			RightOpIsInvoke = true;
+    			RightOpIsInvokeOrHasArrRef = true;
+        		G.v().out.println("RightOpIsInvoke:********"+val+"*************");
+    			
+    			for(Value tValue : ((InvokeExpr)val).getArgs()){
+    				if(!rightCondValue.contains(tValue))
+    					rightCondValue.add(tValue);
+    			}
+    		}
+    		else if(val instanceof ArrayRef){
+    			rightOpHasArrRef = true;
+    			RightOpIsInvokeOrHasArrRef = true;
+        		G.v().out.println("rightOpHasArrRef:********"+val+"*************");
+    			Value tIndexValue = ((ArrayRef)val).getIndex();
+    			if(!rightCondValue.contains(tIndexValue))
+					rightCondValue.add(tIndexValue);
+    		}
+
+//			Iterator<ValueBox> vbIt = val.getUseBoxes().iterator();
+//        	while(vbIt.hasNext()){
+//            	Value tValue = vbIt.next().getValue();
+//            	G.v().out.println("rightCondValue tValue: "+tValue);
+            	if(!rightCondValue.contains(val))
+            		rightCondValue.add(val);
+//            }
+//    			
+    	}
+    	rightCondValue.retainAll(condVals);
+    	G.v().out.println("rightCondValue: "+rightCondValue);
+
 		/* deal with there is conval in leftop(ArrayRef) */
 		if(leftOpValue instanceof ArrayRef){
+			LeftOpHasArrayRef=true;
 			Value indexValue = ((ArrayRef) leftOpValue).getIndex();
         	G.v().out.println(" indexValue: "+indexValue+";");
         	
-        	/* just deal with baseValue, beacause baseValue maybe in condvalue*/
+        	/* just deal with indexValue, because indexValue maybe in condvalue, like a[x]=y or a[x]=b*/
 			if(currUseVals.contains(indexValue)){
 				ArrayList<Value> oneValueList = new ArrayList<>();
 	    		oneValueList.add(indexValue);
-	    		
-				Local tmpArrRefBase = Jimple.v().newLocal("tmpArrRefBase"+Long.toString(counter), leftOpValue.getType());
-				aBody.getLocals().add(tmpArrRefBase);
-				localArray.add(tmpArrRefBase);
-    			G.v().out.println("tmpArrRefBase: "+tmpArrRefBase.toString());    	        	
 
-    			/* insert tmpArrRefBase init stmt after all identitystmt*/
-				DefinitionStmt assignStmt = initAssignStmt(tmpArrRefBase);
+    			G.v().out.println("leftOpValue.getType(): "+rightOp.getType());    	        	
+
+				Local tmpArrRefIndex = Jimple.v().newLocal("tmpLeftArrRefIndexValue"+Long.toString(counter), leftOpValue.getType());
+				aBody.getLocals().add(tmpArrRefIndex);
+				localArray.add(tmpArrRefIndex);
+    			G.v().out.println("tmpArrRefIndex: "+tmpArrRefIndex.toString());    	        	
+
+    			/* insert tmpArrRefIndex init stmt after all identitystmt*/
+				DefinitionStmt assignStmt = initAssignStmt(tmpArrRefIndex);
     			G.v().out.println("newAssignStmt is: "+assignStmt.toString());
     	        G.v().out.println("lastIdentityStmt is: "+lastIdentityStmt.toString());
     			units.insertAfter(assignStmt, lastIdentityStmt);
 				
-    			/* insert new assignstmt*/
-				assignStmt = Jimple.v().newAssignStmt(tmpArrRefBase, indexValue);
+    			/* insert new assignstmt, tmp = x*/
+				assignStmt = Jimple.v().newAssignStmt(tmpArrRefIndex, indexValue);
 				units.insertBefore(assignStmt, currProStmt);
-				
-				/* replace new assignstmt*/
+    			G.v().out.println("new leftOpValue is: ++++++++++++++++++++++++++ "+leftOpValue+"++++++++++++++++++++++");
+				/* replace new assignstmt, tmp = get*/
     			replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, assignStmt, oneValueList);
     			
-    			/* replace leftOpValue*/
-    			((ArrayRef)leftOpValue).setIndex(tmpArrRefBase);
+    			/* replace leftOpValue, */
+    			((ArrayRef)leftOpValue).setIndex(tmpArrRefIndex);
     			G.v().out.println("new leftOpValue is: ++++++++++++++++++++++++++ "+leftOpValue+"++++++++++++++++++++++");
     			
     			/* replace currProstmt*/
     			((AssignStmt)currProStmt).setLeftOp(leftOpValue);
-			}
-		}
-		
-    	analyzeExp(rightOp, values, operator, cons, variable);//
-    	
-		boolean rightOpIsInvoke = false;
-		boolean rightOpHasArrRef = false;
-    	for(Value val:values){
-    		G.v().out.println("the rightOp val is: "+val+";");
-    		if(val instanceof InvokeExpr){//||(val instanceof ArrayRef)
-    			rightOpIsInvoke = true;
-    		}
-    		else if(val instanceof ArrayRef)
-    			rightOpHasArrRef = true;
-    	}
-    	if(rightOpIsInvoke){
-        	G.v().out.println("the invokestmt rightop is: "+rightOp+";");
-			for(Value invokeParaValue:currUseVals){
-	    		ArrayList<Value> oneValueList = new ArrayList<>();
-	    		oneValueList.add(invokeParaValue);
-				Local tmpGetInvoke = Jimple.v().newLocal("tmpGetInvoke"+Long.toString(counter), leftOpValue.getType());
-				aBody.getLocals().add(tmpGetInvoke);
-				localArray.add(tmpGetInvoke);
-    			G.v().out.println("tmpValue: "+tmpGetInvoke.toString());    	        	
-
-				DefinitionStmt assignStmt = initAssignStmt(tmpGetInvoke);
-    			G.v().out.println("newAssignStmt is: "+assignStmt.toString());
-    	        G.v().out.println("lastIdentityStmt is: "+lastIdentityStmt.toString());
-    			units.insertAfter(assignStmt, lastIdentityStmt);
-				
-				assignStmt = Jimple.v().newAssignStmt(tmpGetInvoke, invokeParaValue);
-				units.insertBefore(assignStmt, currProStmt);
-
-    			replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, assignStmt, oneValueList);
+    			G.v().out.println("new AssignStmt is: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
     			
-    			G.v().out.println("InvokeExpr to be replaced is: ++++++++++++++++++++++++++ "+rightOp+"++++++++++++++++++++++");        			
-    			int argIndex = ((InvokeExpr)rightOp).getArgs().indexOf(invokeParaValue);
-    			((InvokeExpr)rightOp).setArg(argIndex, tmpGetInvoke);     			
-    			G.v().out.println("new invokeExpr is: ++++++++++++++++++++++++++ "+rightOp+"++++++++++++++++++++++");
-    			((AssignStmt)currProStmt).setRightOp(rightOp);
-    		}
-			G.v().out.println("new InvokeStmt is: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
-			return;
+    			if(!rightCondValue.isEmpty()){
+        			replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, currProStmt, rightCondValue);
+    			}
+    			return;
+			}
+//			else{
+//				//contruct tmpGetInvoke to store currUseValue
+//				Local tmpGetArrRef = Jimple.v().newLocal("tmpGetRightArrRef"+Long.toString(counter), leftOpValue.getType());
+//				aBody.getLocals().add(tmpGetArrRef);
+//				localArray.add(tmpGetArrRef);
+//    			G.v().out.println("tmpValue: "+tmpGetArrRef.toString());   
+//    			
+//    			/*init tmpGetInvoke ainvokeExprtmpExprfter all IdentityStmts*/
+//				DefinitionStmt assignStmt = initAssignStmt(tmpGetArrRef);
+//    			units.insertAfter(assignStmt, lastIdentityStmt);
+//				
+//    			/*contruct assignstmt "tmpGetInvoke = x"*/
+//				assignStmt = Jimple.v().newAssignStmt(tmpGetArrRef, rightOp);
+//    			G.v().out.println("newAssignStmt is: "+assignStmt.toString());
+//				units.insertBefore(assignStmt, currProStmt);
+//
+//    			G.v().out.println("currUseValue is: "+rightCondValue.toString());
+//    			replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, assignStmt, rightCondValue);
+//    			
+//    			G.v().out.println("new arrRefExpr is: ++++++++++++++++++++++++++ "+rightOp+"++++++++++++++++++++++");
+//    			((AssignStmt)currProStmt).setRightOp(tmpGetArrRef);
+//    			return;
+//			}
 		}
-    	else if(rightOpHasArrRef){
-        	G.v().out.println("the arrayRef rightop is: "+rightOp+";");
-			for(Value arrRefParaValue:currUseVals){
-				//the new currUseValue for the new assignstmt
-	    		ArrayList<Value> oneValueList = new ArrayList<>();
-	    		oneValueList.add(arrRefParaValue);
-	    		
-	    		//contruct tmpGetInvoke to store currUseValue
-				Local tmpGetArrRef = Jimple.v().newLocal("tmpGetArrRef"+Long.toString(counter), arrRefParaValue.getType());
-				aBody.getLocals().add(tmpGetArrRef);
-				localArray.add(tmpGetArrRef);
-    			G.v().out.println("tmpValue: "+tmpGetArrRef.toString());    	        	
-
-    			/*init tmpGetInvoke after all IdentityStmts*/
-				DefinitionStmt assignStmt = initAssignStmt(tmpGetArrRef);
+    	
+//    	if(rightCondValue.isEmpty())//value in curruseValue only in leftop, then return; like tmp=a[b] or tmp=invoke(b);
+//    		return;
+    	
+    	//to process stmt like a=invoke(x) or a=a[y], currusevalue is x or b
+		if(RightOpIsInvokeOrHasArrRef){
+			for(Value tRightCondValue : rightCondValue){
+				//use oneValueList to store only-one-condval
+				ArrayList<Value> oneValueList = new ArrayList<>();
+				oneValueList.add(tRightCondValue);		
+				G.v().out.println("oneValueList: "+oneValueList.toString());   			
+				
+	//			G.v().out.println("start insert an invoke tmp");
+				Local tmpValue = Jimple.v().newLocal("tmpRightInvokeValue"+Long.toString(counter), tRightCondValue.getType());
+				aBody.getLocals().add(tmpValue);
+				localArray.add(tmpValue);
+				G.v().out.println("tmpValue: "+tmpValue.toString());    	        	
+	
+				//insert tmpValue init stmt after all IdentityStmts
+				DefinitionStmt assignStmt = initAssignStmt(tmpValue);
+				G.v().out.println("newAssignStmt is: "+assignStmt.toString());	        			
+				G.v().out.println("lastIdentityStmt is: "+lastIdentityStmt.toString());
+				units.insertAfter(assignStmt, lastIdentityStmt);
+				
+				//insert tmp=x or tmp=y
+				assignStmt = Jimple.v().newAssignStmt(tmpValue,tRightCondValue);
+				units.insertBefore(assignStmt, currProStmt);
+				//replace tmp=x or tmp=y to tmp=get();
+				replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, (Unit)assignStmt, oneValueList);
+	
+				int paraIndex;
+				if(RightOpIsInvoke){//rightop is one invokeExpr
+					paraIndex = ((InvokeExpr)rightOp).getArgs().indexOf(tRightCondValue);
+					((InvokeExpr)rightOp).setArg(paraIndex, tmpValue);
+				}else if(rightOpHasArrRef){
+					((ArrayRef)rightOp).setIndex(tmpValue);
+				}
+			}
+			G.v().out.println("start replace before currStmt: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
+			((AssignStmt)currProStmt).setRightOp(rightOp);
+			G.v().out.println("The replaced stmt is: ++++++++++++++++++++++++++ "+currProStmt.getClass()+"++++++++++++++++++++++");  
+			return;	
+//			values.clear();
+//			operator.clear();
+//		    analyzeExp(tmpValue, values, operator, cons, variable);//
+		}
+//    	
+//		boolean rightOpIsInvoke = false;
+//		boolean rightOpHasArrRef = false;
+//    	for(Value val:values){
+//    		G.v().out.println("the rightOp val is: "+val+";");
+//    		if(val instanceof InvokeExpr){//||(val instanceof ArrayRef)
+//    			rightOpIsInvoke = true;
+//    		}
+//    		else if(val instanceof ArrayRef)
+//    			rightOpHasArrRef = true;
+//    	}
+//    	if(rightOpIsInvoke){
+//        	G.v().out.println("the invokestmt rightop is: "+rightOp+";");
+//			for(Value invokeParaValue:currUseVals){//currUseVals not only contain the rightop
+//	    		ArrayList<Value> oneValueList = new ArrayList<>();
+//	    		oneValueList.add(invokeParaValue);
+//				Local tmpGetInvoke = Jimple.v().newLocal("tmpGetInvoke"+Long.toString(counter), leftOpValue.getType());
+//				aBody.getLocals().add(tmpGetInvoke);
+//				localArray.add(tmpGetInvoke);
+//    			G.v().out.println("tmpValue: "+tmpGetInvoke.toString());    	        	
+//
+//				DefinitionStmt assignStmt = initAssignStmt(tmpGetInvoke);
 //    			G.v().out.println("newAssignStmt is: "+assignStmt.toString());
 //    	        G.v().out.println("lastIdentityStmt is: "+lastIdentityStmt.toString());
-    			units.insertAfter(assignStmt, lastIdentityStmt);
-				
-    			/*contruct assignstmt "tmpGetInvoke = arrRefParaValue"*/
-				assignStmt = Jimple.v().newAssignStmt(tmpGetArrRef, arrRefParaValue);
-    			G.v().out.println("newAssignStmt is: "+assignStmt.toString());
-				units.insertBefore(assignStmt, currProStmt);
-
-    			G.v().out.println("currUseValu is: "+oneValueList.toString());
-    			replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, assignStmt, oneValueList);
-    			
-    			G.v().out.println("arrRefExpr to be replaced is: ++++++++++++++++++++++++++ "+rightOp+"++++++++++++++++++++++");        			
-    			    			
-    			if(arrRefParaValue.toString().equals(((ArrayRef)rightOp).getBase().toString())){
-    				((ArrayRef)rightOp).setBase(tmpGetArrRef);
-    			}
-    			else if(arrRefParaValue.toString().equals(((ArrayRef)rightOp).getIndex().toString())){
-    				((ArrayRef)rightOp).setIndex(tmpGetArrRef);
-    			}
-    			
-    			G.v().out.println("new arrRefExpr is: ++++++++++++++++++++++++++ "+rightOp+"++++++++++++++++++++++");
-    			((AssignStmt)currProStmt).setRightOp(rightOp);
-    		}
-			G.v().out.println("new arrRefExprStmt is: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
-			return;
-    	}
-    	
+//    			units.insertAfter(assignStmt, lastIdentityStmt);
+//				
+//				assignStmt = Jimple.v().newAssignStmt(tmpGetInvoke, invokeParaValue);
+//				units.insertBefore(assignStmt, currProStmt);
+//
+//    			replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, assignStmt, oneValueList);
+//    			
+//    			G.v().out.println("InvokeExpr to be replaced is: ++++++++++++++++++++++++++ "+rightOp+"++++++++++++++++++++++");        			
+//    			int argIndex = ((InvokeExpr)rightOp).getArgs().indexOf(invokeParaValue);
+//    			((InvokeExpr)rightOp).setArg(argIndex, tmpGetInvoke);     			
+//    			G.v().out.println("new invokeExpr is: ++++++++++++++++++++++++++ "+rightOp+"++++++++++++++++++++++");
+//    			((AssignStmt)currProStmt).setRightOp(rightOp);
+//    		}
+//			G.v().out.println("new InvokeStmt is: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
+//			return;
+//		}
+//    	else if(rightOpHasArrRef){
+//        	G.v().out.println("the arrayRef rightop is: "+rightOp+";");
+//			for(Value arrRefParaValue:currUseVals){
+//				//the new currUseValue for the new assignstmt
+//	    		ArrayList<Value> oneValueList = new ArrayList<>();
+//	    		oneValueList.add(arrRefParaValue);
+//	    		
+//	    		//contruct tmpGetInvoke to store currUseValue
+//				Local tmpGetArrRef = Jimple.v().newLocal("tmpGetArrRef"+Long.toString(counter), arrRefParaValue.getType());
+//				aBody.getLocals().add(tmpGetArrRef);
+//				localArray.add(tmpGetArrRef);
+//    			G.v().out.println("tmpValue: "+tmpGetArrRef.toString());    	        	
+//
+//    			/*init tmpGetInvoke ainvokeExprtmpExprfter all IdentityStmts*/
+//				DefinitionStmt assignStmt = initAssignStmt(tmpGetArrRef);
+////    			G.v().out.println("newAssignStmt is: "+assignStmt.toString());
+////    	        G.v().out.println("lastIdentityStmt is: "+lastIdentityStmt.toString());
+//    			units.insertAfter(assignStmt, lastIdentityStmt);
+//				
+//    			/*contruct assignstmt "tmpGetInvoke = arrRefParaValue"*/
+//				assignStmt = Jimple.v().newAssignStmt(tmpGetArrRef, arrRefParaValue);
+//    			G.v().out.println("newAssignStmt is: "+assignStmt.toString());
+//				units.insertBefore(assignStmt, currProStmt);
+//
+//    			G.v().out.println("currUseValu is: "+oneValueList.toString());
+//    			replaceValueGetStmt(aBody, sgxObjLocal, units, localArray, assignStmt, oneValueList);
+//    			
+//    			G.v().out.println("arrRefExpr to be replaced is: ++++++++++++++++++++++++++ "+rightOp+"++++++++++++++++++++++");        			
+//    			    			
+//    			if(arrRefParaValue.toString().equals(((ArrayRef)rightOp).getBase().toString())){
+//    				((ArrayRef)rightOp).setBase(tmpGetArrRef);
+//    			}
+//    			else if(arrRefParaValue.toString().equals(((ArrayRef)rightOp).getIndex().toString())){
+//    				((ArrayRef)rightOp).setIndex(tmpGetArrRef);
+//    			}
+//    			
+//    			G.v().out.println("new arrRefExpr is: ++++++++++++++++++++++++++ "+rightOp+"++++++++++++++++++++++");
+//    			((AssignStmt)currProStmt).setRightOp(rightOp);
+//    		}
+//			G.v().out.println("new arrRefExprStmt is: ++++++++++++++++++++++++++ "+currProStmt+"++++++++++++++++++++++");
+//			return;
+//    	}
+//    	
 		int index=0;
 
 		String left_index="-1";
@@ -803,18 +929,14 @@ public class Transformer
 			G.v().out.println("stmt has no first operand:********"+left_index+"*************");
 		if(right_index == "-1")
 			G.v().out.println("stmt has no second operand:********"+right_index+"*************");
-		
-		boolean LeftOpIsArrayRef=false;
-    	if(leftOpValue instanceof ArrayRef)
-    		LeftOpIsArrayRef = true;
-
+	
 //		G.v().out.println("start insert an un-invoke get");
 //		G.v().out.println("leftOpvalue  is: "+leftOpValue+"*******");
 		
     	toCall = Scene.v().getMethod (returnTypeIndexToCallFunc(returnTypeIndex));
 		DefinitionStmt assignStmt=null;
 
-		if(LeftOpIsArrayRef){
+		if(LeftOpHasArrayRef){
 			/*contruct tmpRef */
 			Local tmpRef=Jimple.v().newLocal
 					("tmpArrayRef"+String.valueOf(counter),leftOpValue.getType());				 
@@ -827,7 +949,8 @@ public class Transformer
 			G.v().out.println("newAssignStmt is: "+assignStmt.toString());	        			
 			G.v().out.println("lastIdentityStmt is: "+lastIdentityStmt.toString());
 			units.insertAfter(assignStmt, lastIdentityStmt);
-
+			
+			G.v().out.println("leftop is: "+leftOpValue.toString());
 			/*tmpRef assignstmt "tmpArrayRef=getIntValue()"*/
 			assignStmt = Jimple.v().newAssignStmt(tmpRef,
 					Jimple.v().newVirtualInvokeExpr
@@ -845,11 +968,12 @@ public class Transformer
 			units.remove(currProStmt);
 		}
 		
-//		InvokeExpr invokeExprtmpExpr = Jimple.v().newVirtualInvokeExpr
-//		          (sgxObjLocal, toCall.makeRef(), Arrays.asList());
-//		G.v().out.println("invokeExprtmpExpr is:++++++"+invokeExprtmpExpr+"++++++++");
-////		G.v().out.println("invokeExprtmpExpr type is:++++++"+invokeExprtmpExp+"++++++++");
-//		((AssignStmt)currProStmt).setRightOp((Value)invokeExprtmpExpr);
+//		G.v().out.println("leftop is: "+leftOpValue.toString());
+//		InstanceInvokeExpr invokeExprtmpExpr = Jimple.v().newVirtualInvokeExpr(sgxObjLocal, toCall.makeRef(), Arrays.asList());
+////		G.v().out.println("invokeExprtmpExpr is:++++++"+invokeExprtmpExpr+"++++++++");
+//////		G.v().out.println("invokeExprtmpExpr type is:++++++"+invokeExprtmpExp+"++++++++");
+//		((AssignStmt)currProStmt).setRightOp(invokeExprtmpExpr);
+
 		
 //		G.v().out.println("rightOpvalueOfAssignment is:++++++"+rightOp+"++++++++");
 //		G.v().out.println("currProStmt units is: ++++ "+currProStmt.getUseBoxes()+"++++++++++++");
@@ -1070,25 +1194,19 @@ public class Transformer
             	Value tValue = vbIterator.next().getValue();
             	rightCondValue.add(tValue);
             }	
-//    		if(condVals.contains(val))
-//    			isRightOpInCondVal=true;
-//    		if(val instanceof ParameterRef){
-//				G.v().out.println("the ParameterRef is: "+val);
-//				localArray.add(val);
-//				((ParameterRef)val).
-//    		}
     			
     	}
     	rightCondValue.retainAll(condVals);
     	G.v().out.println("rightCondValue: "+rightCondValue);
     	
+    	
     	//to process stmt like x=invoke(temp1) or x=invoke(y)
 		if(RightOpIsInvoke){
 //			G.v().out.println("start insert an invoke tmp");
-			Local tmpValue = Jimple.v().newLocal("tmpResult"+Long.toString(counter), leftOpValue.getType());
+			Local tmpValue = Jimple.v().newLocal("tmpRightInvokeStmtValue"+Long.toString(counter), leftOpValue.getType());
 			aBody.getLocals().add(tmpValue);
 			localArray.add(tmpValue);
-			G.v().out.println("tmpValue: "+tmpValue.toString());    	        	
+			G.v().out.println("tmpValue: "+tmpValue.toString()); 
 
 			//insert tmpValue init stmt after all IdentityStmts
 			DefinitionStmt assignStmt = initAssignStmt(tmpValue);
@@ -1192,7 +1310,7 @@ public class Transformer
 				}
 				if(!setParam0){
 					if(values.get(0) instanceof ParameterRef){
-						G.v().out.println("the only @paraRef Value is: "+values.get(0));
+						G.v().out.println("the only constant Value is: "+values.get(0));
 						//new local = @paraRef1
 					}
 					else if(values.get(0) instanceof Constant){
@@ -1295,12 +1413,12 @@ public class Transformer
 				}
 			}
 			if(!setParam0){
-				G.v().out.println("left @paraRef Value is: "+values.get(0));
+				G.v().out.println("left constant Value is: "+values.get(0));
 				left_index = ((Value)(values.get(0))).getType().toString()+"_"+values.get(0);
 				setParam0=true;
 			}
 			if(!setParam1){
-				G.v().out.println("right @paraRef Value is: "+values.get(1));
+				G.v().out.println("right constant Value is: "+values.get(1));
 				right_index = ((Value)(values.get(1))).getType().toString()+"_"+values.get(1);
 				setParam1=true;
 			}
@@ -1400,9 +1518,10 @@ public class Transformer
 			values.add(exp);
 //			isInvoke = true;
 		}
-		else if(exp instanceof InstanceInvokeExpr){
-//			G.v().out.println("InvokeExpr:********"+exp.toString()+"*************");
-			values.add(exp);
+		else if(exp instanceof InvokeExpr){
+			G.v().out.println("InvokeExpr:********"+exp.toString()+"*************");
+			G.v().out.println("InvokeExpr:********"+exp.getClass()+"*************");
+			values.add(exp);//20190126
 //			isInvoke = true;
 		}
 		else if(exp instanceof BinopExpr){//add add div mul or sub xor rem shl shr 
@@ -1412,11 +1531,12 @@ public class Transformer
 			operator.add(((BinopExpr)exp).getSymbol());
 		}
 		else if(exp instanceof InstanceOfExpr){
-//			G.v().out.println("InstanceOfExpr exp********"+exp.toString()+"*************");
+			G.v().out.println("InstanceOfExpr exp********"+exp.toString()+"*************");
+			G.v().out.println("InvokeExpr:********"+exp.getClass()+"*************");
 		}
 		else if(exp instanceof CastExpr){
 //			G.v().out.println("CastExpr exp********"+exp.toString()+"*************");
-			analyzeExp(((BinopExpr)exp).getOp1(), values, operator, cons, variable);
+			analyzeExp(((CastExpr)exp).getOp(), values, operator, cons, variable);
 //			operator.add(((CastExpr)exp).get);
 		}else{
 			if(exp instanceof Constant){
@@ -1429,10 +1549,10 @@ public class Transformer
 				// variable.add(((Local)exp));
 			}else if(exp instanceof ArrayRef){
 //				G.v().out.println("ArrayRef:********"+exp.toString()+"*************");
-				values.add(exp);
+				values.add(exp);//20190126
 //				isInvoke = true;
 			}else {
-//				G.v().out.println("other type:********"+exp.getClass()+"*************");
+				G.v().out.println("other type:********"+exp.getClass()+"*************");
 				values.add(exp);
 				// isInvoke = true;
 			}

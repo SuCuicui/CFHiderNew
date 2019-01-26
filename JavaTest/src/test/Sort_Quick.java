@@ -34,7 +34,7 @@ public class Sort_Quick {
 	 
 	 public static int getMiddle(int[] numbers, int low,int high)
 	    {
-//		    System.out.println("getMiddle(): ");
+		    System.out.println("getMiddle(): ");
 	        int temp = numbers[low]; //数组的第一个作为中轴
 	        while(low < high)
 	        {
@@ -61,7 +61,7 @@ public class Sort_Quick {
 	     */
 	    public static void quickSort(int[] numbers,int low,int high)
 	    {
-//		    System.out.println("quickSort(): ");
+		    System.out.println("quickSort(): ");
 	        if(low < high)
 	        {
 	          int middle = getMiddle(numbers,low,high); //将numbers数组进行一分为二
@@ -79,7 +79,7 @@ public class Sort_Quick {
 	     */
 	    public static void quick(int[] numbers)
 	    {
-//		    System.out.println("quick(): ");
+		    System.out.println("quick(): ");
 	        if(numbers.length > 0)   //查看数组是否为空
 	        {
 	        quickSort(numbers, 0, numbers.length-1);
@@ -89,7 +89,7 @@ public class Sort_Quick {
 	 
 	 public static void printArr(int[] numbers)
 	    {
-//		    System.out.println("printArr(): ");
+		    System.out.println("printArr(): ");
 	        for(int i = 0 ; i < numbers.length ; i++ )
 	        {
 //		        System.out.println("No"+i+": ");

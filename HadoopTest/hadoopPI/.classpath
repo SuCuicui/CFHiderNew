@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/home/xidian/CFHiderNew/soot-lib/soot-trunk.jar"/>
+	<classpathentry kind="lib" path="/home/xidian/hadoop-1.0.4/lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="/home/xidian/hadoop-1.0.4/hadoop-core-1.0.4.jar"/>
+	<classpathentry kind="lib" path="/home/xidian/hadoop-1.0.4/hadoop-tools-1.0.4.jar"/>
 	<classpathentry kind="lib" path="/home/xidian/CFHiderNew/soot-lib/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="/home/xidian/CFHiderNew/soot-lib/commons-logging-1.1.3.jar"/>
 	<classpathentry kind="lib" path="/home/xidian/CFHiderNew/soot-lib/jasminclasses-custom.jar"/>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<attributes>
+<attribute>
+<srcPos sline="0" eline="0" spos="0" epos="0"/>
+<jmpPos sline="29" eline="29" spos="0" epos="0"/>
+<text info="Signature: (Lorg/apache/hadoop/io/BooleanWritable;Ljava/util/Iterator<Lorg/apache/hadoop/io/LongWritable;>;Lorg/apache/hadoop/mapred/OutputCollector<Lorg/apache/hadoop/io/WritableComparable<*>;Lorg/apache/hadoop/io/Writable;>;Lorg/apache/hadoop/mapred/Reporter;)V" aType="SignatureTag"/>
+</attribute>
+</attributes>

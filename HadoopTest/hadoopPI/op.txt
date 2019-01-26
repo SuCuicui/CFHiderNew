@@ -1,0 +1,27 @@
+javac -classpath /home/xidian/hadoop/hadoop-core-1.0.4.jar:/home/xidian/hadoop/lib/commons-cli-1.2.jar -d ./bin ./src/*.java
+
+javac -classpath /home/ck/hadoop/hadoop-core-1.0.4.jar:/home/ck/hadoop/lib/commons-cli-1.2.jar -d ./hbin ./hsrc/*.java
+bin/hadoop jar hadoop-examples-1.0.4.jar terasort sortinput sortout01
+
+jar -cfm TestFakeSegmentForJniHadoop.jar a.txt FakeSegmentForJni/ pegasus/
+
+time bin/hadoop jar hadoop-examples-1.0.4.jar  pi 2 4
+time bin/hadoop jar /home/xidian/hadoop-tsetcase/hadoopPI/TransFakeSegmentForJni/TestFakeSegmentForJniHadoop.jar 2 4
+
+
+
+
+
+_________________________
+
+pi 10 100000 
+
+origin:   55.068s
+
+replece:  1m25.821s
+
+fullfake: 7m9.913s
+
+1m26.061s
+
+_________________________
