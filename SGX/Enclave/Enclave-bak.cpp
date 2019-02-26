@@ -5,7 +5,7 @@
 #include <sgx_cpuid.h>
 #include <stdlib.h>
 #include <cstring>
-#define Table_Len 100
+#define Table_Len 100000
 #define MAX 100
 #include "io/fcntl.h"
 #include "io/mman.h"
@@ -18,17 +18,6 @@
 
 #include "Enclave.h"
 #include "Enclave_t.h"  /* print_string */
-
-void printf(const char *fmt, ...)
-{
-    char buf[BUFSIZ] = {'\0'};
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(buf, BUFSIZ, fmt, ap);
-    va_end(ap);
-    ocall_print_string(buf);
-}
-
 //----------------struct-------------------
 struct Table_attr{
   long length;
@@ -43,68 +32,14 @@ struct Table_meta{
 };
 
 //---------------------global------------------
-//int v_int[Table_Len];
-//double v_double[Table_Len];
-//float v_float[Table_Len];
-//char v_char[Table_Len];
-//long v_long[Table_Len];
-//char v_byte[Table_Len];
 
-struct v_array{
-	int v_int[Table_Len];
-	double v_double[Table_Len];
-	char v_char[Table_Len];
-	float v_float[Table_Len];
-	char v_byte[Table_Len];
-	long v_long[Table_Len];
-}v_a[50];
-
-v_array *p1 = &v_a[0];
-
-//------------Stack------------
-struct stack{
-	v_array* sta[50];
-	int top=-1;
-};
-
-void init_stack(struct stack* s){
-	memset(s->sta, 0, sizeof(s->sta));
-	s->top = -1;
-}
-//压栈
-int in_stack(struct stack* s,v_array* data){
-	if (s->top == 50 - 1) {
-		printf("the stack is full. \n");
-		return 1;
-	}
-	(s->top)++;
-	s->sta[s->top] = data;
-	//printf("after in:%d\n",data->v_int[0]);
-	return 0;
-}
-//出栈
-int out_stack(struct stack* s){
-	if (s->top < 0) {
-		printf("the stack is empty. \n");
-		return -1;
-	}else {
-		
-		(s->top)--;
-		return 1;
-	}
-}
-//取栈顶
-v_array* get_stacktop(struct stack* s){
-	if (s->top < 0) {
-		printf("the stack is empty. \n");
-	}
-	return s->sta[s->top];
-}
-
-struct stack S;
-
-//--------------------------------------------------------------
-
+int v_int[Table_Len];
+double v_double[Table_Len];
+float v_float[Table_Len];
+char v_char[Table_Len];
+long v_long[Table_Len];
+char v_byte[Table_Len];
+ 
 char file[500]="/home/xidian/CFHiderNew/MatrixEncrypt/SGXindex1";
 
 int hash_int[Table_Len];
@@ -153,7 +88,15 @@ int itoa(int val, char* buf)
 	} while (b < p);  
 	return len;  
 }  
-
+void printf(const char *fmt, ...)
+{
+    char buf[BUFSIZ] = {'\0'};
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buf, BUFSIZ, fmt, ap);
+    va_end(ap);
+    ocall_print_string(buf);
+}
 
 int ecall_ctr_decrypt(uint8_t *sql, 
 	const char *sgx_ctr_key, uint8_t *p_dst,int len)    //ecall_ctr_decrypt(c,key_t,ppp,64);
@@ -266,16 +209,9 @@ int split_file()
 	return 0;
 }
 
-void print_array(){
-	for(int i=0;i<5;i++){
-		printf("v_int[%d]=%d",i,get_stacktop(&S)->v_int[i]);
-	}
-	printf("\n");
-}
 
 int read_table(char* file)
 {
-	
 	memset(ret,0,10000000);
 	char* key_t="1234567812345678";
 
@@ -373,8 +309,14 @@ int encall_read_line(char* in_buf,int buf_len,long line)
 	return 0;
 }
 
-
+// void print_IntArray(){
+// 	for(int i=0;i<7;i++){
+// 		printf("v_int[%d]=%d\n",i,v_int[i]);
+// 	}
+// }
 void encall_varible(int* v_array,int size) {
+		//ocall_print_int(size);
+		//ocall_print_int(v_array[1]);
 		int i;
 		int i1=0,f1=0,d1=0,c1=0,l1=0,b1 = 0;
 		for (int j = 1;j <= size;j++) {
@@ -383,22 +325,22 @@ void encall_varible(int* v_array,int size) {
 					switch (j)
 					{
 					case 1:
-						p1->v_int[i1++] = 0;
+						v_int[i1++] = 0;
 						break;
 					case 2:
-						p1->v_double[d1++] = 0.0;
+						v_double[d1++] = 0.0;
 						break;
 					case 3:
-						p1->v_float[f1++] = 0.0;
+						v_float[f1++] = 0.0;
 						break;
 					case 4:
-						p1->v_char[c1++] = NULL;
+						v_char[c1++] = NULL;
 						break;
 					case 5:
-						p1->v_long[l1++] = 0;
+						v_long[l1++] = 0;
 						break;
 					case 6:
-						p1->v_byte[b1++] = NULL;
+						v_byte[b1++] = NULL;
 						break;
 					default:
 						break;
@@ -406,22 +348,38 @@ void encall_varible(int* v_array,int size) {
 				}
 			}
 		}
-		//push
-		int ret;
-		ret = in_stack(&S, p1);
-		p1++;
-}
-int encall_deleteValue() {
-	int ret;
-	ret = out_stack(&S);
-	if(ret == -1){
-	    return -1;	
+
+	printf("init value in encalve:\n");
+	for(int i=0;i<i1;i++){
+		printf("v_int[%d]=%d ",i,v_int[i]);
 	}
-	return 1;
+	printf("\n");
+
+
+	for(int i=0;i<f1;i++){
+		printf("v_float[%d]=%f ",i,v_float[i]);
+	}
+	printf("\n");
+
+	for(int i=0;i<d1;i++){
+		printf("v_double[%d]=%f ",i,v_double[i]);
+	}
+	printf("\n");
+
+	for(int i=0;i<l1;i++){
+		printf("v_long[%d]=%ld ",i,v_long[i]);
+	}
+	printf("\n");
+//printf("int_array_len=%d\n",i1);
+//printf("double_array_len=%d\n",d1);
+//printf("float_array_len=%d\n",f1);
+//printf("char_array_len=%d\n",c1);
+//printf("long_array_len=%d\n",l1);
+//printf("byte_array_len=%d\n",b1);
 }
 
 int encall_switch_type_i(long Line, int* int_array, int lenint,double* double_array, int lendouble,float* float_array, int lenfloat,char* char_array, int lenchar,long* long_array, int lenlong,char* byte_array, int lenbyte) {
-//ocall_print_string("go in encall_switch_type_i\n");
+// ocall_print_string("go in encall_switch_type_i\n");
 	int type=*(table+Line*5);
 	if (type == 10) {
 		return 0;
@@ -435,8 +393,7 @@ int encall_switch_type_i(long Line, int* int_array, int lenint,double* double_ar
 		case 5:return_flag = print_long(Line, long_array);break;
 		case 6:return_flag = print_byte(Line, byte_array);break;
 		default:return_flag = -5;
-	}
-	// print_array();
+		}
 	return return_flag;
 }
 
@@ -541,7 +498,7 @@ int print_int(long Line, int* int_array)//---------------------------int
 //printf("op1=%d\n",meta.p1);
 //printf("op2=%d\n",meta.p2);
 //printf("op=%d\n",meta.op);
-//printf("para_name=%d\n",meta.para_name);
+//printf("re=%d\n",meta.para_name);
 
 		int return_flag = -999;
 		int para1,para2;
@@ -550,14 +507,14 @@ int print_int(long Line, int* int_array)//---------------------------int
 		}else if(meta.p1<10 && meta.p1>=0){ //list
 			para1 = int_array[meta.p1];
 		}else{ //encalve
-			para1 = get_stacktop(&S)->v_int[meta.p1 % 10];
+			para1 = v_int[meta.p1 % 10];
 		}
 		if (meta.p2 < 0){  //consants
 			para2 = hash_int[0-meta.p2];
 		}else if(meta.p2<10 && meta.p2>=0){ //list
 			para2 = int_array[meta.p2];
 		}else{ //encalve
-			para2 = get_stacktop(&S)->v_int[meta.p2 % 10];
+			para2 = v_int[meta.p2 % 10];
 		}
 		switch (meta.op) {
 			case -1:return_flag = para1;
@@ -575,13 +532,20 @@ int print_int(long Line, int* int_array)//---------------------------int
 			default:return_flag = -11;
 		}
 		if (meta.para_name>0) {  //update
-			get_stacktop(&S)->v_int[meta.para_name % 10] = return_flag;
+			v_int[meta.para_name % 10] = return_flag;
 			//printf("Update v_int[%d]=%d\n",meta.para_name % 10,return_flag);
 			return_flag = 1000;
 		}
-//printf("top=%d\n",get_stacktop(&S)->v_int[3]);
+//ocall_print_string("i success\n");
 		// print_array();
-		return return_flag;
+
+	// printf("after update int:\n");
+	// for(int i=0;i<10;i++){
+	// 	printf("v_int[%d]=%d ",i,v_int[i]);
+	// }
+	// printf("\n");
+		
+	return return_flag;
 
 }
 
@@ -595,7 +559,7 @@ double print_double(long Line, double* double_array)//--------------------------
 		}else if(meta.p1<10 && meta.p1>=0){ //list
 			para1 = double_array[meta.p1];
 		}else{ //encalve
-			para1 = get_stacktop(&S)->v_double[meta.p1 % 10];
+			para1 = v_double[meta.p1 % 10];
 		}
 		
 		if (meta.p2 < 0){  //consants
@@ -603,7 +567,7 @@ double print_double(long Line, double* double_array)//--------------------------
 		}else if(meta.p2<10 && meta.p2>=0){ //list
 			para2 = double_array[meta.p2];
 		}else{ //encalve
-			para2 = get_stacktop(&S)->v_double[meta.p2 % 10];
+			para2 = v_double[meta.p2 % 10];
 		}
 		printf("pa1=%lf,pa2=%lf\n",para1,para2);
 		switch (meta.op) {
@@ -622,10 +586,15 @@ double print_double(long Line, double* double_array)//--------------------------
 			default:return_flag = -11;
 		}
 		if (meta.para_name>0) { 
-			get_stacktop(&S)->v_double[meta.para_name % 10] = return_flag;
+			v_double[meta.para_name % 10] = return_flag;
 			return_flag = 1000;
 		}
-ocall_print_string("d success\n");
+		ocall_print_string("d success\n");
+
+	for(int i=0;i<10;i++){
+		printf("v_double[%d]=%f ",i,v_double[i]);
+	}
+	// printf("\n");
 		return return_flag;
 }
 
@@ -639,7 +608,7 @@ float print_float(long Line, float* float_array)//---------------------------flo
 		}else if(meta.p1<10 && meta.p1>=0){ //list
 			para1 = float_array[meta.p1];
 		}else{ //encalve
-			para1 = get_stacktop(&S)->v_float[meta.p1 % 10];
+			para1 = v_float[meta.p1 % 10];
 		}
 		
 		if (meta.p2 < 0){  //consants
@@ -647,7 +616,7 @@ float print_float(long Line, float* float_array)//---------------------------flo
 		}else if(meta.p2<10 && meta.p2>=0){ //list
 			para2 = float_array[meta.p2];
 		}else{ //encalve
-			para2 = get_stacktop(&S)->v_float[meta.p2 % 10];
+			para2 = v_float[meta.p2 % 10];
 		}
 		switch (meta.op) {
 			case -1:return_flag = para1;   //x=2; or x=y;
@@ -665,10 +634,17 @@ float print_float(long Line, float* float_array)//---------------------------flo
 			default:return_flag = -11;
 		}
 		if (meta.para_name>0) { 
-			get_stacktop(&S)->v_float[meta.para_name % 10] = return_flag;
+			v_float[meta.para_name % 10] = return_flag;
 			return_flag = 1000;
 		}
 ocall_print_string("f success\n");
+		
+
+	for(int i=0;i<10;i++){
+		printf("v_float[%d]=%f ",i,v_float[i]);
+	}
+	printf("\n");
+
 		return return_flag;
 }
 
@@ -684,7 +660,7 @@ char print_char(long Line, char* char_array)//---------------------------char
 		}else if(meta.p1<10 && meta.p1>=0){ //list
 			para1 = char_array[meta.p1];
 		}else{ //encalve
-			para1 = get_stacktop(&S)->v_char[meta.p1 % 10];
+			para1 = v_char[meta.p1 % 10];
 		}
 		
 		if (meta.p2 < 0){  //consants
@@ -692,7 +668,7 @@ char print_char(long Line, char* char_array)//---------------------------char
 		}else if(meta.p2<10 && meta.p2>=0){ //list
 			para2 = char_array[meta.p2];
 		}else{ //encalve
-			para2 = get_stacktop(&S)->v_char[meta.p2 % 10];
+			para2 = v_char[meta.p2 % 10];
 		}
 		switch (meta.op) {
 			case -1:return_flag = para1;   //x=2; or x=y;
@@ -710,7 +686,7 @@ char print_char(long Line, char* char_array)//---------------------------char
 			default:return_flag = -11;
 		}
 		if (meta.para_name>0) { 
-			get_stacktop(&S)->v_char[meta.para_name % 10] = return_flag;
+			v_char[meta.para_name % 10] = return_flag;
 			return_flag = '?';
 		}
 ocall_print_string("c success\n");
@@ -728,7 +704,7 @@ ocall_print_string("go in print_long\n");
 		}else if(meta.p1<10 && meta.p1>=0){ //list
 			para1 = long_array[meta.p1];
 		}else{ //encalve
-			para1 = get_stacktop(&S)->v_long[meta.p1 % 10];
+			para1 = v_long[meta.p1 % 10];
 		}
 		
 		if (meta.p2 < 0){  //consants
@@ -736,7 +712,7 @@ ocall_print_string("go in print_long\n");
 		}else if(meta.p2<10 && meta.p2>=0){ //list
 			para2 = long_array[meta.p2];
 		}else{ //encalve
-			para2 = get_stacktop(&S)->v_long[meta.p2 % 10];
+			para2 = v_long[meta.p2 % 10];
 		}
 		
 		switch (meta.op) {
@@ -759,10 +735,15 @@ ocall_print_string("go in print_long\n");
 		//printf("op is:%d\n",meta.op);
 		//printf("meta.para_name is:%d\n",meta.para_name);
 		if (meta.para_name>0) { 
-			get_stacktop(&S)->v_long[meta.para_name % 10] = return_flag;
+			v_long[meta.para_name % 10] = return_flag;
 			return_flag = 1000;
 		}
 ocall_print_string("l success\n");
+
+	for(int i=0;i<10;i++){
+		printf("v_long[%d]=%ld ",i,v_long[i]);
+	}
+	printf("\n");
 		return return_flag;
 }
 
@@ -776,14 +757,14 @@ char print_byte(long Line, char* byte_array)//---------------------------byte
 		}else if(meta.p1<10 && meta.p1>=0){ //list
 			para1 = byte_array[meta.p1];
 		}else{ //encalve
-			para1 = get_stacktop(&S)->v_byte[meta.p1 % 10];
+			para1 = v_byte[meta.p1 % 10];
 		}
 		if (meta.p2 < 0){  //consants
 			para2 = hash_byte[0-meta.p2];
 		}else if(meta.p1<10 && meta.p1>=0){ //list
 			para2 = byte_array[meta.p2];
 		}else{ //encalve
-			para2 = get_stacktop(&S)->v_byte[meta.p2 % 10];
+			para2 = v_byte[meta.p2 % 10];
 		}
 		switch (meta.op) {
 			case -1:return_flag = para1;   //x=2; or x=y;
@@ -801,7 +782,7 @@ char print_byte(long Line, char* byte_array)//---------------------------byte
 			default:return_flag = -11;
 		}
 		if (meta.para_name>0) { 
-			get_stacktop(&S)->v_byte[meta.para_name % 10] = return_flag;
+			v_byte[meta.para_name % 10] = return_flag;
 			return_flag = '?';
 		}
 ocall_print_string("b success\n");
