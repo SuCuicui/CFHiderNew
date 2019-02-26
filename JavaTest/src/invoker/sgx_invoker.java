@@ -146,11 +146,13 @@ public class sgx_invoker{
 		ret = commitUpdate(counter, intArray,intTail,doubleArray,doubleTail,floatArray,floatTail,longArray,longTail,charArray,charTail,byteArray,byteTail);
 		
 		if(ret == 1){
-//			 System.out.println("updateValueInEnclave is okay!");
+//			System.out.println("updateValueInEnclave is okay!");
 			return;
 		}
-		else if(ret == 0)
+		else if(ret == 0){
 			System.out.println("error!");
+			return;
+		}
 		else{
 			
 			//throw new Exception("error");

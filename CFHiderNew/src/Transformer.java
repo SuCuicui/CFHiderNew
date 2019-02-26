@@ -5,15 +5,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.omg.CORBA.PRIVATE_MEMBER;
 
 import com.sun.java.swing.plaf.windows.WindowsTreeUI.ExpandedIcon;
-import com.sun.xml.internal.ws.api.server.Invoker;
-
 import soot.*;
-import soot.JastAddJ.ArrayAccess;
-import soot.JastAddJ.LongType;
-import soot.JastAddJ.TypeDecl;
+
 import soot.javaToJimple.LocalGenerator;
-import soot.jbco.util.Rand;
-import soot.jimple.AnyNewExpr;
+
 import soot.jimple.ArrayRef;
 import soot.jimple.AssignStmt;
 import soot.jimple.BinopExpr;

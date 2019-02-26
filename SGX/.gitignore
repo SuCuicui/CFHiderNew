@@ -1,3 +1,4 @@
-/app
-/enclave.signed.so
-/enclave.so
+app
+*.so
+*_u*
+*_t*

@@ -20,13 +20,13 @@ using namespace std;
 #include "invoker_sgx_invoker.h"
 
 typedef unsigned char byte;
-#define ArrayLen 10000
+#define ArrayLen 100//10000
 //-------------------------------------------------
-int hash_int[10000];
-double hash_double[10000];
-float hash_float[10000];
-char hash_char[10000];
-long hash_long[10000];
+// int hash_int[10000];
+// double hash_double[10000];
+// float hash_float[10000];
+// char hash_char[10000];
+// long hash_long[10000];
 int sgx_use_flag=0;
 /* Global EID shared by multiple threads */
 sgx_enclave_id_t global_eid = 1;
@@ -607,6 +607,8 @@ JNIEXPORT jint JNICALL Java_invoker_sgx_1invoker_commitUpdate
 	char charArray[ArrayLen];
 	long longArray[ArrayLen];
 	char byteArray[ArrayLen];
+
+	// printf("commitupdate log1!!");
 	
 	jint *body_i = env->GetIntArrayElements(jintArray, 0);
 	for (int i=0; i<ArrayLen; i++)
@@ -653,15 +655,17 @@ JNIEXPORT jint JNICALL Java_invoker_sgx_1invoker_commitUpdate
 	if(sgx_use_flag!=1){printf("not init yet");return -12;}
 
 	int rei=999;
+
+	// printf("counter=%ld\n", counter);
 	sgx_status_t ret=encall_switch_type_i(global_eid,&rei,counter,intArray,intTail,
 			doubleArray,doubleTail,
 			floatArray,floatTail,
 			charArray,charTail,
 			longArray,longTail,
 			byteArray,byteTail);
-	//printf("update rei=%d\n",rei);
+	// printf("update rei=%d\n",rei);
 	if(rei == 1000){
-		//print_error_message(ret);
+		// print_error_message(ret);
 		return 1;
 	}	
 	return 0;

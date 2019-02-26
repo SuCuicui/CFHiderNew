@@ -54,7 +54,7 @@ public class Sort_Bubble {
 	 
 	 public static void printArr(int[] numbers)
 	    {
-//		    System.out.println("printArr(): ");
+		    System.out.println("printArr(): ");
 	        for(int i = 0 ; i < numbers.length ; i++ )
 	        {
 //		        System.out.println("No"+i+": ");
